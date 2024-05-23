@@ -12,17 +12,17 @@
     "html": false
   },
   "attributes": {
-    "content": {
-      "type": "string",
-      "default": "Hello World!"
-    },
     "color": {
       "type": "string",
       "default": "#00ff00"
     },
-    "selectedOption": {
+    "selectedOptionShortcode": {
       "type": "string",
-      "default": "option1"
+      "default": ""
+    },
+    "selectedOptionProvider": {
+      "type": "string",
+      "default": ""
     }
   },
   "textdomain": "locate-block",

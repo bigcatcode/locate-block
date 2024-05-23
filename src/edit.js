@@ -1,61 +1,71 @@
 import { __ } from '@wordpress/i18n';
-import {
-	useBlockProps,
-	InspectorControls,
-	RichText,
-} from '@wordpress/block-editor';
-import { PanelBody, ColorPalette, SelectControl } from '@wordpress/components';
+
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 
+import apiFetch from '@wordpress/api-fetch';
+
 import LocateSelectShortcode from "./components/LocateSelectShortcode";
+import PanelGlobalOptions from "./components/PanelGlobalOptions";
+import PanelMapSettings from "./components/PanelMapSettings";
 
 const { Fragment } = wp.element;
 
 // editor style
 import './editor.scss';
 
-// colors
-import colors from './utilities/colors-palette';
-
 export default function Edit({ attributes, setAttributes }) {
-    const { content, color, customAttribute } = attributes; // Add your custom attribute here
-
-    const updateCustomAttribute = (newValue) => {
+    const { selectedOptionShortcode, customAttribute } = attributes; 
+   
+	const updateCustomAttribute = (newValue) => {
         setAttributes({ customAttribute: newValue });
     };
 
+	const [posts, setPosts] = useState([]);
+
+    const fetchPosts = () => {
+		const relativeApiUrl = '/wp/v2/locateandfiltermap';
+        apiFetch({ path: relativeApiUrl })
+            .then((res) => {
+                setPosts(res);
+            })
+            .catch((error) => {
+                console.error('Error fetching posts:', error);
+            });
+    };
+
+	useEffect(() => {
+	  fetchPosts()
+	}, [])
 
 	return (
 		<Fragment>
+
 			<InspectorControls>
-				<PanelBody
-					title={__('Global Options', 'locate')}
-					initialOpen={true}
-				>
-				</PanelBody>		
-				<PanelBody
-					title={__('Map Settings', 'boilerplate')}
-					initialOpen={false}
-				>
-					<p className="custom__editor__label">
-						{__('Text Color', 'boilerplate')}
-					</p>
-					<ColorPalette
-						colors={colors}
-						value={color}
-						onChange={(newColor) =>
-							setAttributes({ color: newColor })
-						}
+				
+				<PanelGlobalOptions
+					attributes={{ ...attributes, posts }}
+					setAttributes={(newAttributes) => {
+						setAttributes(newAttributes);
+					}}
+				/>
+				
+				{selectedOptionShortcode && (
+					<PanelMapSettings
+						attributes={{ ...attributes, posts }}
+						setAttributes={(newAttributes) => {
+							setAttributes(newAttributes);
+						}}
 					/>
-				</PanelBody>
+				)}
+							
 			</InspectorControls>
 
             <div {...useBlockProps()}>
                 <LocateSelectShortcode
-                    attributes={{ ...attributes, customAttribute }} // Pass your custom attribute here
+                    attributes={{ ...attributes, customAttribute, posts }} 
                     setAttributes={(newAttributes) => {
                         setAttributes(newAttributes);
-                        // You can also do additional processing here if needed
                     }}
                 />
             </div>
