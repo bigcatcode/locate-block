@@ -5,7 +5,10 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { PanelBody, ColorPalette, SelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
+
+import LocateSelectShortcode from "./components/LocateSelectShortcode";
+
 const { Fragment } = wp.element;
 
 // editor style
@@ -15,24 +18,24 @@ import './editor.scss';
 import colors from './utilities/colors-palette';
 
 export default function Edit({ attributes, setAttributes }) {
-	const { content, color } = attributes;
-	const { selectedOption } = attributes;
+    const { content, color, customAttribute } = attributes; // Add your custom attribute here
+
+    const updateCustomAttribute = (newValue) => {
+        setAttributes({ customAttribute: newValue });
+    };
+
+
 	return (
 		<Fragment>
 			<InspectorControls>
-				<SelectControl
-					label={__('Select an Option', 'text-domain')}
-					value={selectedOption}
-					options={[
-						{ label: 'Option 1', value: 'option1' },
-						{ label: 'Option 2', value: 'option2' },
-						{ label: 'Option 3', value: 'option3' },
-					]}
-					onChange={(newOption) => setAttributes({ selectedOption: newOption })}
-                />				
 				<PanelBody
-					title={__('Settings', 'boilerplate')}
+					title={__('Global Options', 'locate')}
 					initialOpen={true}
+				>
+				</PanelBody>		
+				<PanelBody
+					title={__('Map Settings', 'boilerplate')}
+					initialOpen={false}
 				>
 					<p className="custom__editor__label">
 						{__('Text Color', 'boilerplate')}
@@ -47,16 +50,16 @@ export default function Edit({ attributes, setAttributes }) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div {...useBlockProps()}>
-				<RichText
-					tagName="h4"
-					value={content}
-					onChange={(newContent) =>
-						setAttributes({ content: newContent })
-					}
-					style={{ color }}
-				/>
-			</div>
+            <div {...useBlockProps()}>
+                <LocateSelectShortcode
+                    attributes={{ ...attributes, customAttribute }} // Pass your custom attribute here
+                    setAttributes={(newAttributes) => {
+                        setAttributes(newAttributes);
+                        // You can also do additional processing here if needed
+                    }}
+                />
+            </div>
+
 		</Fragment>
 	);
 }

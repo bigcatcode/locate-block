@@ -5,5 +5,19 @@
  */
 
 .wp-block-create-block-locate-block {
-	border: 1px dotted #f00;
+	padding: 20px;
+	background-color: #008cba;
 }
+.wp-block-create-block-locate-block h3 {
+	text-align: center;
+	margin: 0;
+}
+.locate_select_shortcode {
+	max-width: 280px;
+    align-items: center;
+    margin: auto;
+}
+.locate_select_shortcode label {
+	color: white;
+}
+

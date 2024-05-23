@@ -1,8 +1,8 @@
 {
 	"name": "locate-block",
 	"version": "0.1.0",
-	"description": "Example block scaffolded with Create Block tool.",
-	"author": "The WordPress Contributors",
+	"description": "Gutenberg block for LocateAndFilter plugin.",
+	"author": "Andrii Monin",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
@@ -18,6 +18,9 @@
 		"@wordpress/scripts": "^27.9.0"
 	},
 	"dependencies": {
-		"@wordpress/element": "^5.35.0"
+		"@wordpress/api-fetch": "^6.55.0",
+		"@wordpress/element": "^5.35.0",
+		"@wordpress/url": "^3.59.0",
+		"axios": "^1.7.2"
 	}
 }

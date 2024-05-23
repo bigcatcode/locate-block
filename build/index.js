@@ -2,6 +2,74 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/components/LocateSelectShortcode.js":
+/*!*************************************************!*\
+  !*** ./src/components/LocateSelectShortcode.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ LocateSelectShortcode)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+function LocateSelectShortcode({
+  attributes,
+  setAttributes
+}) {
+  const {
+    selectedOption
+  } = attributes || {
+    selectedOption: ''
+  };
+  const [posts, setPosts] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)([]);
+  const fetchPosts = () => {
+    const relativeApiUrl = '/wp/v2/locateandfiltermap';
+    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
+      path: relativeApiUrl
+    }).then(res => {
+      setPosts(res);
+    }).catch(error => {
+      console.error('Error fetching posts:', error);
+    });
+  };
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useEffect)(() => {
+    fetchPosts();
+  }, []);
+  const options = [{
+    label: 'Select shortcode',
+    value: ''
+  }, ...posts.map(post => ({
+    label: post.title.rendered,
+    value: post.id
+  }))];
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('LocateAndFilter Block', 'locate')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.SelectControl, {
+    className: "locate_select_shortcode",
+    value: selectedOption,
+    options: options,
+    onChange: newOption => setAttributes({
+      selectedOption: newOption
+    }),
+    __nextHasNoMarginBottom: true
+  }));
+}
+
+/***/ }),
+
 /***/ "./src/edit.js":
 /*!*********************!*\
   !*** ./src/edit.js ***!
@@ -22,8 +90,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
-/* harmony import */ var _utilities_colors_palette__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utilities/colors-palette */ "./src/utilities/colors-palette.js");
+/* harmony import */ var _components_LocateSelectShortcode__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/LocateSelectShortcode */ "./src/components/LocateSelectShortcode.js");
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
+/* harmony import */ var _utilities_colors_palette__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utilities/colors-palette */ "./src/utilities/colors-palette.js");
+
 
 
 
@@ -44,48 +114,40 @@ function Edit({
 }) {
   const {
     content,
-    color
-  } = attributes;
-  const {
-    selectedOption
-  } = attributes;
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.SelectControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Select an Option', 'text-domain'),
-    value: selectedOption,
-    options: [{
-      label: 'Option 1',
-      value: 'option1'
-    }, {
-      label: 'Option 2',
-      value: 'option2'
-    }, {
-      label: 'Option 3',
-      value: 'option3'
-    }],
-    onChange: newOption => setAttributes({
-      selectedOption: newOption
-    })
-  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
-    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Settings', 'boilerplate'),
+    color,
+    customAttribute
+  } = attributes; // Add your custom attribute here
+
+  const updateCustomAttribute = newValue => {
+    setAttributes({
+      customAttribute: newValue
+    });
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Global Options', 'locate'),
     initialOpen: true
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Map Settings', 'boilerplate'),
+    initialOpen: false
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
     className: "custom__editor__label"
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Text Color', 'boilerplate')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.ColorPalette, {
-    colors: _utilities_colors_palette__WEBPACK_IMPORTED_MODULE_6__["default"],
+    colors: _utilities_colors_palette__WEBPACK_IMPORTED_MODULE_7__["default"],
     value: color,
     onChange: newColor => setAttributes({
       color: newColor
     })
   }))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)()
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
-    tagName: "h4",
-    value: content,
-    onChange: newContent => setAttributes({
-      content: newContent
-    }),
-    style: {
-      color
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_LocateSelectShortcode__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    attributes: {
+      ...attributes,
+      customAttribute
+    } // Pass your custom attribute here
+    ,
+    setAttributes: newAttributes => {
+      setAttributes(newAttributes);
+      // You can also do additional processing here if needed
     }
   })));
 }
@@ -252,6 +314,16 @@ module.exports = window["React"];
 
 /***/ }),
 
+/***/ "@wordpress/api-fetch":
+/*!**********************************!*\
+  !*** external ["wp","apiFetch"] ***!
+  \**********************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["apiFetch"];
+
+/***/ }),
+
 /***/ "@wordpress/block-editor":
 /*!*************************************!*\
   !*** external ["wp","blockEditor"] ***!
@@ -308,7 +380,7 @@ module.exports = window["wp"]["i18n"];
   \************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"widgets","icon":"smiley","description":"Example block scaffolded with Create Block tool.","example":{},"supports":{"html":false},"attributes":{"content":{"type":"string","default":"Hello World!"},"color":{"type":"string","default":"#00ff00"},"selectedOption":{"type":"string","default":"option1"}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"widgets","icon":"location","description":"Gutenberg block for LocateAndFilter plugin.","example":{},"supports":{"html":false},"attributes":{"content":{"type":"string","default":"Hello World!"},"color":{"type":"string","default":"#00ff00"},"selectedOption":{"type":"string","default":"option1"}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
 
 /***/ })
 
