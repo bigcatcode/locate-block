@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "create-block/locate-block",
+  "version": "0.1.0",
+  "title": "Locate Block",
+  "category": "widgets",
+  "icon": "smiley",
+  "description": "Example block scaffolded with Create Block tool.",
+  "example": {},
+  "supports": {
+    "html": false
+  },
+  "attributes": {
+    "content": {
+      "type": "string",
+      "default": "Hello World!"
+    },
+    "color": {
+      "type": "string",
+      "default": "#00ff00"
+    },
+    "selectedOption": {
+      "type": "string",
+      "default": "option1"
+    }
+  },
+  "textdomain": "locate-block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./view.js"
+}
