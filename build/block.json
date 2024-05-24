@@ -4,7 +4,7 @@
   "name": "create-block/locate-block",
   "version": "0.1.0",
   "title": "Locate Block",
-  "category": "widgets",
+  "category": "text",
   "icon": "location",
   "description": "Gutenberg block for LocateAndFilter plugin.",
   "example": {},
@@ -12,15 +12,39 @@
     "html": false
   },
   "attributes": {
-    "color": {
-      "type": "string",
-      "default": "#00ff00"
-    },
     "selectedOptionShortcode": {
       "type": "string",
       "default": ""
     },
     "selectedOptionProvider": {
+      "type": "string",
+      "default": ""
+    },
+    "mapWidth": {
+      "type": "number",
+      "default": ""
+    },
+    "mapWidthUnit": {
+      "type": "string",
+      "default": "%"
+    },
+    "mapHeight": {
+      "type": "number",
+      "default": ""
+    },
+    "mapHeightUnit": {
+      "type": "string",
+      "default": "px"
+    },
+    "mapStartPosition": {
+      "type": "string",
+      "default": ""
+    },
+    "mapStartZoom": {
+      "type": "number",
+      "default": ""
+    },
+    "mapscrollWheelZoom": {
       "type": "string",
       "default": ""
     }

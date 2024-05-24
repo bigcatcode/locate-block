@@ -1,10 +1,10 @@
-import { useBlockProps, RichText } from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 
 export default function save({ attributes }) {
-	const { content, color } = attributes;
+	const { selectedOptionShortcode } = attributes;
 	return (
-		<div {...useBlockProps.save()}>
-			<RichText.Content tagName="h4" value={content} style={{ color }} />
+		<div {...useBlockProps.save()} style={{ width: attributes.mapWidth }}>
+			{selectedOptionShortcode}
 		</div>
 	);
 }

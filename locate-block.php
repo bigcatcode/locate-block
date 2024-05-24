@@ -29,6 +29,7 @@ function create_block_locate_block_block_init() {
 }
 add_action( 'init', 'create_block_locate_block_block_init' );
 
+// add custom field to rest API
 function register_locateandfiltermap_custom_fields() {
     register_rest_field(
         'locateandfiltermap', // Your custom post type name
@@ -60,6 +61,56 @@ function register_locateandfiltermap_custom_fields() {
         )
     );
 
+	register_rest_field(
+        'locateandfiltermap', // Your custom post type name
+        'locate-anything-source', // Name of the custom field
+        array(
+            'get_callback'    => 'get_locateandfiltermap_custom_field_value', // Callback function to retrieve field value
+            'update_callback' => 'update_locateandfiltermap_custom_field_value', // Callback function to update field value
+            'schema'          => null,
+        )
+    );
+
+	register_rest_field(
+        'locateandfiltermap', // Your custom post type name
+        'locate-anything-show-filters', // Name of the custom field
+        array(
+            'get_callback'    => 'get_locateandfiltermap_custom_field_value', // Callback function to retrieve field value
+            'update_callback' => 'update_locateandfiltermap_custom_field_value', // Callback function to update field value
+            'schema'          => null,
+        )
+    );
+
+	register_rest_field(
+        'locateandfiltermap', // Your custom post type name
+        'locate-anything-start-position', // Name of the custom field
+        array(
+            'get_callback'    => 'get_locateandfiltermap_custom_field_value', // Callback function to retrieve field value
+            'update_callback' => 'update_locateandfiltermap_custom_field_value', // Callback function to update field value
+            'schema'          => null,
+        )
+    );
+
+	register_rest_field(
+        'locateandfiltermap', // Your custom post type name
+        'locate-anything-start-zoom', // Name of the custom field
+        array(
+            'get_callback'    => 'get_locateandfiltermap_custom_field_value', // Callback function to retrieve field value
+            'update_callback' => 'update_locateandfiltermap_custom_field_value', // Callback function to update field value
+            'schema'          => null,
+        )
+    );
+
+	register_rest_field(
+        'locateandfiltermap', // Your custom post type name
+        'locate-anything-scrollWheelZoom', // Name of the custom field
+        array(
+            'get_callback'    => 'get_locateandfiltermap_custom_field_value', // Callback function to retrieve field value
+            'update_callback' => 'update_locateandfiltermap_custom_field_value', // Callback function to update field value
+            'schema'          => null,
+        )
+    );
+	
 }
 
 function get_locateandfiltermap_custom_field_value($object, $field_name, $request) {
@@ -71,4 +122,37 @@ function update_locateandfiltermap_custom_field_value($value, $object, $field_na
 }
 
 add_action('rest_api_init', 'register_locateandfiltermap_custom_fields');
+
+// create new route - add all map json to rest API
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/cache/(?P<id>\d+)', array(
+        'methods' => 'GET',
+        'callback' => 'get_custom_cache_file',
+        'args' => array(
+            'id' => array(
+                'validate_callback' => function ($param, $request, $key) {
+                    return is_numeric($param);
+                }
+            ),
+        ),
+    ));
+});
+
+function get_custom_cache_file($request) {
+    $id = $request['id'];
+    $file_path = WP_CONTENT_DIR . '/uploads/locateandfilter-cache/cache-' . $id . '.json';
+
+    if (file_exists($file_path)) {
+        $file_contents = file_get_contents($file_path);
+        $data = json_decode($file_contents, true);
+        
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return new WP_REST_Response($data, 200);
+        } else {
+            return new WP_Error('json_error', 'Error decoding JSON file', array('status' => 500));
+        }
+    } else {
+        return new WP_Error('file_not_found', 'File not found', array('status' => 404));
+    }
+}
 

@@ -8,6 +8,7 @@ import apiFetch from '@wordpress/api-fetch';
 import LocateSelectShortcode from "./components/LocateSelectShortcode";
 import PanelGlobalOptions from "./components/PanelGlobalOptions";
 import PanelMapSettings from "./components/PanelMapSettings";
+import Map from "./components/Map";
 
 const { Fragment } = wp.element;
 
@@ -15,11 +16,7 @@ const { Fragment } = wp.element;
 import './editor.scss';
 
 export default function Edit({ attributes, setAttributes }) {
-    const { selectedOptionShortcode, customAttribute } = attributes; 
-   
-	const updateCustomAttribute = (newValue) => {
-        setAttributes({ customAttribute: newValue });
-    };
+    const { selectedOptionShortcode } = attributes; 
 
 	const [posts, setPosts] = useState([]);
 
@@ -62,12 +59,22 @@ export default function Edit({ attributes, setAttributes }) {
 			</InspectorControls>
 
             <div {...useBlockProps()}>
-                <LocateSelectShortcode
-                    attributes={{ ...attributes, customAttribute, posts }} 
-                    setAttributes={(newAttributes) => {
-                        setAttributes(newAttributes);
-                    }}
-                />
+				{!selectedOptionShortcode ? (
+					<LocateSelectShortcode
+						attributes={{ ...attributes, posts }} 
+						setAttributes={(newAttributes) => {
+							setAttributes(newAttributes);
+						}}
+					/>
+				) : (
+					<Map
+						attributes={{ ...attributes }} 
+						setAttributes={(newAttributes) => {
+							setAttributes(newAttributes);
+						}}
+					/>
+				)}
+				 
             </div>
 
 		</Fragment>

@@ -14,7 +14,7 @@ export default function LocateSelectShortcode({ attributes, setAttributes }){
     ];
 
     return (
-        <div>
+        <div className="LocateSelectShortcode">
             <h3>{__('LocateAndFilter Block', 'locate')}</h3>
             <SelectControl
                 className="locate_select_shortcode"
