@@ -88,14 +88,6 @@ __webpack_require__.r(__webpack_exports__);
 const {
   Fragment
 } = wp.element;
-var greenIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
 function Map({
   attributes,
   setAttributes
@@ -134,26 +126,31 @@ function Map({
     }
   }, [selectedOptionShortcode]);
   const [markers, setMarkers] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)([]);
+  const [markersIcon, setMarkersIcon] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)([]);
+  const [defaults, setDefaults] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)([]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (jsonData) {
+      setMarkersIcon(jsonData.index.markers);
+      setDefaults(jsonData.defaults[0].default_marker);
       const fetchedMarkers = jsonData.data.map(project => {
         const projectObj = {};
         jsonData.index.fieldnames.forEach((field, index) => {
-          if (field === 'custom_marker') {
-            // Get the marker ID from the data
-            const markerId = project[index];
-            // Find the marker URL from the index.markers object using the marker ID
-            projectObj[field] = jsonData.index.markers[markerId]?.url || ''; // Use empty string as default if marker URL not found
-          } else {
-            projectObj[field] = project[index];
-          }
+          projectObj[field] = project[index];
         });
         return projectObj;
       });
-      console.log(fetchedMarkers);
+
+      // console.log(fetchedMarkers);
       setMarkers(fetchedMarkers);
     }
   }, [jsonData]);
+  const createIcon = markerId => {
+    const marker = markersIcon[markerId];
+    return L.icon({
+      iconUrl: marker.url,
+      iconSize: [marker.width, marker.height]
+    });
+  };
   const centerCoordinates = mapStartPosition.split(',').map(coord => parseFloat(coord.trim()));
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     setWidth(mapWidth);
@@ -161,7 +158,7 @@ function Map({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     setHeight(mapHeight);
   }, [mapHeight]);
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_5__.MapContainer, {
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_5__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
     zoom: mapStartZoom,
@@ -169,16 +166,15 @@ function Map({
     style: {
       height: `${height}${mapHeightUnit}`,
       width: `${width}${mapWidthUnit}`
-    }
+    },
+    dragging: false
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_6__.TileLayer, {
     attribution: "\xA9 <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   }), markers && markers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_7__.Marker, {
     key: index,
-    position: [parseFloat(marker.lat), parseFloat(marker.lng)]
-    // icon={marker.custom_marker}
-    ,
-    icon: greenIcon
+    position: [parseFloat(marker.lat), parseFloat(marker.lng)],
+    icon: createIcon(marker?.custom_marker || defaults)
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_8__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
 }
 
@@ -328,7 +324,7 @@ function PanelMapSettings({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
     if (!mapStartZoom && currentMapStartZoom) {
       setAttributes({
-        mapStartZoom: currentMapStartZoom
+        mapStartZoom: parseInt(currentMapStartZoom)
       });
     }
   }, [currentMapStartZoom]);

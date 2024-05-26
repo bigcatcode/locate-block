@@ -57,7 +57,7 @@ export default function PanelMapSettings({ attributes, setAttributes }){
 
     useEffect(() => {
         if (!mapStartZoom && currentMapStartZoom) {
-            setAttributes({ mapStartZoom: currentMapStartZoom }); 
+            setAttributes({ mapStartZoom:  parseInt(currentMapStartZoom) }); 
         }
     }, [currentMapStartZoom]); 
 

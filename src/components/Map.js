@@ -14,17 +14,6 @@ import "leaflet/dist/leaflet.css";
 
 const { Fragment } = wp.element;
 
-var greenIcon = new L.Icon({
-    iconUrl:
-      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-    shadowUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
-
 export default function Map({ attributes, setAttributes }){
     const { selectedOptionShortcode } = attributes; 
     const { mapWidth, mapWidthUnit, mapHeight, mapHeightUnit } = attributes;
@@ -32,10 +21,10 @@ export default function Map({ attributes, setAttributes }){
     const { mapStartPosition }  = attributes;
     const { mapStartZoom }  = attributes;
 
-    const [jsonData, setJsonData] = useState(null);
-    
+    const [jsonData, setJsonData] = useState(null);   
     const [width, setWidth] = useState(mapWidth);
     const [height, setHeight] = useState(mapHeight);
+
 
 
 	useEffect(() => {
@@ -52,28 +41,34 @@ export default function Map({ attributes, setAttributes }){
 	}, [selectedOptionShortcode]);
 
     const [markers, setMarkers] = useState([]);
+    const [markersIcon, setMarkersIcon] = useState([]);
+    const [defaults, setDefaults] = useState([]);
+
     useEffect(() => {
         if (jsonData) {
+            setMarkersIcon(jsonData.index.markers);
+            setDefaults(jsonData.defaults[0].default_marker);
             const fetchedMarkers = jsonData.data.map(project => {
                 const projectObj = {};
                 jsonData.index.fieldnames.forEach((field, index) => {
-                    if (field === 'custom_marker') {
-                        // Get the marker ID from the data
-                        const markerId = project[index];
-                        // Find the marker URL from the index.markers object using the marker ID
-                        projectObj[field] = jsonData.index.markers[markerId]?.url || ''; // Use empty string as default if marker URL not found
-                    } else {
-                        projectObj[field] = project[index];
-                    }
+                    projectObj[field] = project[index];
                 });
     
                 return projectObj;
             });
             
-            console.log(fetchedMarkers);
+            // console.log(fetchedMarkers);
             setMarkers(fetchedMarkers);
         }
     }, [jsonData]);
+
+    const createIcon = (markerId) => {
+        const marker = markersIcon[markerId];
+        return L.icon({
+          iconUrl: marker.url,
+          iconSize: [marker.width, marker.height],
+        });
+    };
 
     const centerCoordinates = mapStartPosition.split(',').map(coord => parseFloat(coord.trim()));
 
@@ -85,17 +80,17 @@ export default function Map({ attributes, setAttributes }){
         setHeight(mapHeight);
     }, [mapHeight]);
 
-    
 
     return (
         <Fragment>
-            {height && mapStartPosition && (
+            {height && mapStartPosition && mapStartZoom && (
                 <MapContainer
                     key={`${height}${width}`}
                     center={centerCoordinates}
                     zoom={mapStartZoom}
                     scrollWheelZoom={false}
                     style={{ height: `${height}${mapHeightUnit}`, width: `${width}${mapWidthUnit}` }}
+                    dragging={false}
                 >
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -107,8 +102,7 @@ export default function Map({ attributes, setAttributes }){
                         <Marker 
                             key={index} 
                             position={[parseFloat(marker.lat), parseFloat(marker.lng)]}
-                            // icon={marker.custom_marker}
-                            icon={greenIcon}
+                            icon={createIcon( marker?.custom_marker || defaults )}
                         >
                             <Popup>
                                 <div>
