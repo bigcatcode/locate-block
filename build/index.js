@@ -74,11 +74,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/MapContainer.js");
 /* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/TileLayer.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Marker.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Popup.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/MapContainer.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Marker.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Popup.js");
 /* harmony import */ var leaflet_dist_leaflet_css__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! leaflet/dist/leaflet.css */ "./node_modules/leaflet/dist/leaflet.css");
+/* harmony import */ var react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-leaflet-google-layer */ "./node_modules/react-leaflet-google-layer/lib/index.js");
+/* harmony import */ var react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5__);
+
 
 
 
@@ -110,9 +113,21 @@ function Map({
   const {
     mapStartZoom
   } = attributes;
+  const {
+    selectedOptionProvider
+  } = attributes;
   const [jsonData, setJsonData] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
   const [width, setWidth] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(mapWidth);
   const [height, setHeight] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(mapHeight);
+  const {
+    mapOptions
+  } = attributes;
+  const [apiKey, setApiKey] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(mapOptions);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    if (mapOptions) {
+      setApiKey(mapOptions.googlemaps_key);
+    }
+  }, [mapOptions]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (selectedOptionShortcode) {
       const apiUrl = `/custom/v1/cache/${selectedOptionShortcode}`;
@@ -158,24 +173,65 @@ function Map({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     setHeight(mapHeight);
   }, [mapHeight]);
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_5__.MapContainer, {
+  const [currentLayer, setCurrentLayer] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(selectedOptionProvider);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    setCurrentLayer(selectedOptionProvider);
+  }, [selectedOptionProvider]);
+  const renderLayer = () => {
+    if (apiKey) {
+      switch (currentLayer) {
+        case 'basic-1':
+          return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)((react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5___default()), {
+            key: "basic-1",
+            type: 'terrain',
+            apiKey: apiKey
+          });
+        case 'basic-2':
+          return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)((react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5___default()), {
+            key: "basic-2",
+            type: 'roadmap',
+            apiKey: apiKey
+          });
+        case 'basic-3':
+          return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)((react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5___default()), {
+            key: "basic-3",
+            type: 'satellite',
+            apiKey: apiKey
+          });
+        case 'basic-4':
+          return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)((react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5___default()), {
+            key: "basic-4",
+            type: 'hybrid',
+            apiKey: apiKey
+          });
+        default:
+          return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_6__.TileLayer, {
+            attribution: "\xA9 <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          });
+      }
+    } else {
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_6__.TileLayer, {
+        attribution: "\xA9 <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      });
+    }
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_7__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
     zoom: mapStartZoom,
-    scrollWheelZoom: false,
+    scrollWheelZoom: true,
     style: {
       height: `${height}${mapHeightUnit}`,
       width: `${width}${mapWidthUnit}`
     },
-    dragging: false
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_6__.TileLayer, {
-    attribution: "\xA9 <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  }), markers && markers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_7__.Marker, {
+    dragging: true
+  }, renderLayer(), markers && markers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_8__.Marker, {
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
     icon: createIcon(marker?.custom_marker || defaults)
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_8__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
 }
 
 /***/ }),
@@ -335,6 +391,15 @@ function PanelMapSettings({
       });
     }
   }, [currentMapStartPosition]);
+  const {
+    mapOptions
+  } = attributes;
+  const [apiKey, setApiKey] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(mapOptions);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
+    if (mapOptions) {
+      setApiKey(mapOptions.googlemaps_key);
+    }
+  }, [mapOptions]);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
     title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Map Settings', 'locate'),
     initialOpen: true
@@ -349,20 +414,25 @@ function PanelMapSettings({
       value: 'basic-0',
       label: 'OpenStreetMap'
     }, {
-      value: 'basic-1',
-      label: 'GoogleMaps TERRAIN'
+      value: apiKey ? 'basic-1' : '',
+      label: 'GoogleMaps TERRAIN',
+      disabled: !apiKey
     }, {
-      value: 'basic-2',
-      label: 'GoogleMaps ROADMAP'
+      value: apiKey ? 'basic-2' : '',
+      label: 'GoogleMaps ROADMAP',
+      disabled: !apiKey
     }, {
-      value: 'basic-3',
-      label: 'GoogleMaps SATELLITE'
+      value: apiKey ? 'basic-3' : '',
+      label: 'GoogleMaps SATELLITE',
+      disabled: !apiKey
     }, {
-      value: 'basic-4',
-      label: 'GoogleMaps HYBRID'
+      value: apiKey ? 'basic-4' : '',
+      label: 'GoogleMaps HYBRID',
+      disabled: !apiKey
     }, {
       value: 'addon-0',
-      label: 'Addon overlays'
+      label: 'Addon overlays',
+      disabled: true
     }],
     onChange: newOption => setAttributes({
       selectedOptionProvider: newOption
@@ -459,6 +529,17 @@ function Edit({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
     fetchPosts();
   }, []);
+  const [mapOptions, setMapOptions] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(null);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
+    const apiUrlOptions = `/custom/v1/map-options`;
+    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
+      path: apiUrlOptions
+    }).then(data => {
+      setMapOptions(data);
+    }).catch(error => {
+      console.error('Error fetching JSON data:', error);
+    });
+  }, []);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_PanelGlobalOptions__WEBPACK_IMPORTED_MODULE_6__["default"], {
     attributes: {
       ...attributes,
@@ -470,7 +551,8 @@ function Edit({
   }), selectedOptionShortcode && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_PanelMapSettings__WEBPACK_IMPORTED_MODULE_7__["default"], {
     attributes: {
       ...attributes,
-      posts
+      posts,
+      mapOptions
     },
     setAttributes: newAttributes => {
       setAttributes(newAttributes);
@@ -487,7 +569,8 @@ function Edit({
     }
   }) : (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_Map__WEBPACK_IMPORTED_MODULE_8__["default"], {
     attributes: {
-      ...attributes
+      ...attributes,
+      mapOptions
     },
     setAttributes: newAttributes => {
       setAttributes(newAttributes);
@@ -582,6 +665,787 @@ function save({
     }
   }, selectedOptionShortcode);
 }
+
+/***/ }),
+
+/***/ "./node_modules/leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js ***!
+  \**********************************************************************************/
+/***/ (() => {
+
+(function () {
+	'use strict';
+
+	/**
+	 * GoogleMutant by Iván Sánchez Ortega <ivan@sanchezortega.es> https://ivan.sanchezortega.es
+	 * Source and issue tracking: https://gitlab.com/IvanSanchez/Leaflet.GridLayer.GoogleMutant/
+	 *
+	 * Based on techniques from https://github.com/shramov/leaflet-plugins
+	 * and https://avinmathew.com/leaflet-and-google-maps/ , but relying on MutationObserver.
+	 *
+	 * "THE BEER-WARE LICENSE":
+	 * <ivan@sanchezortega.es> wrote this file. As long as you retain this notice you
+	 * can do whatever you want with this stuff. If we meet some day, and you think
+	 * this stuff is worth it, you can buy me a beer in return.
+	 *
+	 * Uses MIT-licensed code from https://github.com/rsms/js-lru/
+	 */
+
+	// This implementation of LRUMap is a copy of https://github.com/rsms/js-lru/ ,
+	// trivially adapted for ES6 exports.
+
+	/*
+	The MIT License
+
+	Copyright (c) 2010-2020 Rasmus Andersson <https://rsms.me/>
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+	*/
+
+	/**
+	 * A doubly linked list-based Least Recently Used (LRU) cache. Will keep most
+	 * recently used items while discarding least recently used items when its limit
+	 * is reached.
+	 *
+	 * Licensed under MIT. Copyright (c) 2010 Rasmus Andersson <http://hunch.se/>
+	 * See README.md for details.
+	 *
+	 * Illustration of the design:
+	 *
+	 *       entry             entry             entry             entry
+	 *       ______            ______            ______            ______
+	 *      | head |.newer => |      |.newer => |      |.newer => | tail |
+	 *      |  A   |          |  B   |          |  C   |          |  D   |
+	 *      |______| <= older.|______| <= older.|______| <= older.|______|
+	 *
+	 *  removed  <--  <--  <--  <--  <--  <--  <--  <--  <--  <--  <--  added
+	 */
+
+	var NEWER = Symbol("newer");
+	var OLDER = Symbol("older");
+
+	var LRUMap = function LRUMap(limit, entries) {
+		if (typeof limit !== "number") {
+			// called as (entries)
+			entries = limit;
+			limit = 0;
+		}
+
+		this.size = 0;
+		this.limit = limit;
+		this.oldest = this.newest = undefined;
+		this._keymap = new Map();
+
+		if (entries) {
+			this.assign(entries);
+			if (limit < 1) {
+				this.limit = this.size;
+			}
+		}
+	};
+
+	LRUMap.prototype._markEntryAsUsed = function _markEntryAsUsed (entry) {
+		if (entry === this.newest) {
+			// Already the most recenlty used entry, so no need to update the list
+			return;
+		}
+		// HEAD--------------TAIL
+		//   <.older   .newer>
+		//  <--- add direction --
+		//   A  B  C  <D>  E
+		if (entry[NEWER]) {
+			if (entry === this.oldest) {
+				this.oldest = entry[NEWER];
+			}
+			entry[NEWER][OLDER] = entry[OLDER]; // C <-- E.
+		}
+		if (entry[OLDER]) {
+			entry[OLDER][NEWER] = entry[NEWER]; // C. --> E
+		}
+		entry[NEWER] = undefined; // D --x
+		entry[OLDER] = this.newest; // D. --> E
+		if (this.newest) {
+			this.newest[NEWER] = entry; // E. <-- D
+		}
+		this.newest = entry;
+	};
+
+	LRUMap.prototype.assign = function assign (entries) {
+		var entry,
+			limit = this.limit || Number.MAX_VALUE;
+		this._keymap.clear();
+		var it = entries[Symbol.iterator]();
+		for (var itv = it.next(); !itv.done; itv = it.next()) {
+			var e = new Entry(itv.value[0], itv.value[1]);
+			this._keymap.set(e.key, e);
+			if (!entry) {
+				this.oldest = e;
+			} else {
+				entry[NEWER] = e;
+				e[OLDER] = entry;
+			}
+			entry = e;
+			if (limit-- == 0) {
+				throw new Error("overflow");
+			}
+		}
+		this.newest = entry;
+		this.size = this._keymap.size;
+	};
+
+	LRUMap.prototype.get = function get (key) {
+		// First, find our cache entry
+		var entry = this._keymap.get(key);
+		if (!entry) { return; } // Not cached. Sorry.
+		// As <key> was found in the cache, register it as being requested recently
+		this._markEntryAsUsed(entry);
+		return entry.value;
+	};
+
+	LRUMap.prototype.set = function set (key, value) {
+		var entry = this._keymap.get(key);
+
+		if (entry) {
+			// update existing
+			entry.value = value;
+			this._markEntryAsUsed(entry);
+			return this;
+		}
+
+		// new entry
+		this._keymap.set(key, (entry = new Entry(key, value)));
+
+		if (this.newest) {
+			// link previous tail to the new tail (entry)
+			this.newest[NEWER] = entry;
+			entry[OLDER] = this.newest;
+		} else {
+			// we're first in -- yay
+			this.oldest = entry;
+		}
+
+		// add new entry to the end of the linked list -- it's now the freshest entry.
+		this.newest = entry;
+		++this.size;
+		if (this.size > this.limit) {
+			// we hit the limit -- remove the head
+			this.shift();
+		}
+
+		return this;
+	};
+
+	LRUMap.prototype.shift = function shift () {
+		// todo: handle special case when limit == 1
+		var entry = this.oldest;
+		if (entry) {
+			if (this.oldest[NEWER]) {
+				// advance the list
+				this.oldest = this.oldest[NEWER];
+				this.oldest[OLDER] = undefined;
+			} else {
+				// the cache is exhausted
+				this.oldest = undefined;
+				this.newest = undefined;
+			}
+			// Remove last strong reference to <entry> and remove links from the purged
+			// entry being returned:
+			entry[NEWER] = entry[OLDER] = undefined;
+			this._keymap.delete(entry.key);
+			--this.size;
+			return [entry.key, entry.value];
+		}
+	};
+
+	// -------------------------------------------------------------------------------------
+	// Following code (until end of class definition) is optional and can be removed without
+	// breaking the core functionality.
+
+	LRUMap.prototype.find = function find (key) {
+		var e = this._keymap.get(key);
+		return e ? e.value : undefined;
+	};
+
+	LRUMap.prototype.has = function has (key) {
+		return this._keymap.has(key);
+	};
+
+	LRUMap.prototype.delete = function delete$1 (key) {
+		var entry = this._keymap.get(key);
+		if (!entry) { return; }
+		this._keymap.delete(entry.key);
+		if (entry[NEWER] && entry[OLDER]) {
+			// relink the older entry with the newer entry
+			entry[OLDER][NEWER] = entry[NEWER];
+			entry[NEWER][OLDER] = entry[OLDER];
+		} else if (entry[NEWER]) {
+			// remove the link to us
+			entry[NEWER][OLDER] = undefined;
+			// link the newer entry to head
+			this.oldest = entry[NEWER];
+		} else if (entry[OLDER]) {
+			// remove the link to us
+			entry[OLDER][NEWER] = undefined;
+			// link the newer entry to head
+			this.newest = entry[OLDER];
+		} else {
+			// if(entry[OLDER] === undefined && entry.newer === undefined) {
+			this.oldest = this.newest = undefined;
+		}
+
+		this.size--;
+		return entry.value;
+	};
+
+	LRUMap.prototype.clear = function clear () {
+		// Not clearing links should be safe, as we don't expose live links to user
+		this.oldest = this.newest = undefined;
+		this.size = 0;
+		this._keymap.clear();
+	};
+
+	LRUMap.prototype.keys = function keys () {
+		return new KeyIterator(this.oldest);
+	};
+
+	LRUMap.prototype.values = function values () {
+		return new ValueIterator(this.oldest);
+	};
+
+	LRUMap.prototype.entries = function entries () {
+		return this;
+	};
+
+	LRUMap.prototype[Symbol.iterator] = function () {
+		return new EntryIterator(this.oldest);
+	};
+
+	LRUMap.prototype.forEach = function forEach (fun, thisObj) {
+		if (typeof thisObj !== "object") {
+			thisObj = this;
+		}
+		var entry = this.oldest;
+		while (entry) {
+			fun.call(thisObj, entry.value, entry.key, this);
+			entry = entry[NEWER];
+		}
+	};
+
+	/** Returns a JSON (array) representation */
+	LRUMap.prototype.toJSON = function toJSON () {
+		var s = new Array(this.size),
+			i = 0,
+			entry = this.oldest;
+		while (entry) {
+			s[i++] = { key: entry.key, value: entry.value };
+			entry = entry[NEWER];
+		}
+		return s;
+	};
+
+	/** Returns a String representation */
+	LRUMap.prototype.toString = function toString () {
+		var s = "",
+			entry = this.oldest;
+		while (entry) {
+			s += String(entry.key) + ":" + entry.value;
+			entry = entry[NEWER];
+			if (entry) {
+				s += " < ";
+			}
+		}
+		return s;
+	};
+
+	function Entry(key, value) {
+		this.key = key;
+		this.value = value;
+		this[NEWER] = undefined;
+		this[OLDER] = undefined;
+	}
+
+	function EntryIterator(oldestEntry) {
+		this.entry = oldestEntry;
+	}
+	EntryIterator.prototype[Symbol.iterator] = function () {
+		return this;
+	};
+	EntryIterator.prototype.next = function () {
+		var ent = this.entry;
+		if (ent) {
+			this.entry = ent[NEWER];
+			return { done: false, value: [ent.key, ent.value] };
+		} else {
+			return { done: true, value: undefined };
+		}
+	};
+
+	function KeyIterator(oldestEntry) {
+		this.entry = oldestEntry;
+	}
+	KeyIterator.prototype[Symbol.iterator] = function () {
+		return this;
+	};
+	KeyIterator.prototype.next = function () {
+		var ent = this.entry;
+		if (ent) {
+			this.entry = ent[NEWER];
+			return { done: false, value: ent.key };
+		} else {
+			return { done: true, value: undefined };
+		}
+	};
+
+	function ValueIterator(oldestEntry) {
+		this.entry = oldestEntry;
+	}
+	ValueIterator.prototype[Symbol.iterator] = function () {
+		return this;
+	};
+	ValueIterator.prototype.next = function () {
+		var ent = this.entry;
+		if (ent) {
+			this.entry = ent[NEWER];
+			return { done: false, value: ent.value };
+		} else {
+			return { done: true, value: undefined };
+		}
+	};
+
+	// GoogleMutant by Iván Sánchez Ortega <ivan@sanchezortega.es>
+
+	function waitForAPI(callback, context) {
+		var checkCounter = 0,
+			intervalId = null;
+
+		intervalId = setInterval(function () {
+			if (checkCounter >= 20) {
+				clearInterval(intervalId);
+				throw new Error("window.google not found after 10 seconds");
+			}
+			if (!!window.google && !!window.google.maps && !!window.google.maps.Map) {
+				clearInterval(intervalId);
+				callback.call(context);
+			}
+			++checkCounter;
+		}, 500);
+	}
+
+	// 🍂class GridLayer.GoogleMutant
+	// 🍂extends GridLayer
+	L.GridLayer.GoogleMutant = L.GridLayer.extend({
+		options: {
+			maxZoom: 21, // can be 23, but ugly if more than maxNativeZoom
+			// 🍂option type: String = 'roadmap'
+			// Google's map type. Valid values are 'roadmap', 'satellite' or 'terrain'. 'hybrid' is not really supported.
+			type: "roadmap",
+			maxNativeZoom: 21,
+		},
+
+		initialize: function (options) {
+			L.GridLayer.prototype.initialize.call(this, options);
+
+			// Couple data structures indexed by tile key
+			this._tileCallbacks = {}; // Callbacks for promises for tiles that are expected
+			this._lru = new LRUMap(100); // Tile LRU cache
+
+			this._imagesPerTile = this.options.type === "hybrid" ? 2 : 1;
+
+			this._boundOnMutatedImage = this._onMutatedImage.bind(this);
+		},
+
+		onAdd: function (map) {
+			var this$1 = this;
+
+			L.GridLayer.prototype.onAdd.call(this, map);
+			this._initMutantContainer();
+
+			// Attribution and logo nodes are not mutated a second time if the
+			// mutant is removed and re-added to the map, hence they are
+			// not cleaned up on layer removal, so they can be added here.
+			if (this._logoContainer) {
+				map._controlCorners.bottomleft.appendChild(this._logoContainer);
+			}
+			if (this._attributionContainer) {
+				map._controlCorners.bottomright.appendChild(this._attributionContainer);
+			}
+
+			waitForAPI(function () {
+				if (!this$1._map) {
+					return;
+				}
+				this$1._initMutant();
+
+				//handle layer being added to a map for which there are no Google tiles at the given zoom
+				google.maps.event.addListenerOnce(this$1._mutant, "idle", function () {
+					if (!this$1._map) {
+						return;
+					}
+					this$1._checkZoomLevels();
+					this$1._mutantIsReady = true;
+				});
+			});
+		},
+
+		onRemove: function (map) {
+			L.GridLayer.prototype.onRemove.call(this, map);
+			this._observer.disconnect();
+			map._container.removeChild(this._mutantContainer);
+			if (this._logoContainer) {
+				L.DomUtil.remove(this._logoContainer);
+			}
+			if (this._attributionContainer) {
+				L.DomUtil.remove(this._attributionContainer);
+			}
+			if (this._mutant) {
+				google.maps.event.clearListeners(this._mutant, "idle");
+			}
+		},
+
+		// 🍂method addGoogleLayer(name: String, options?: Object): this
+		// Adds layer with the given name and options to the google Map instance.
+		// `name`: one of the google maps API layers, with it's constructor available in `google.maps` object.
+		// currently following values supported: 'TrafficLayer', 'TransitLayer', 'BicyclingLayer'.
+		// `options`: see https://developers.google.com/maps/documentation/javascript/reference/map
+		addGoogleLayer: function (googleLayerName, options) {
+			var this$1 = this;
+
+			if (!this._subLayers) { this._subLayers = {}; }
+			this.whenReady(function () {
+				var Constructor = google.maps[googleLayerName];
+				var googleLayer = new Constructor(options);
+				googleLayer.setMap(this$1._mutant);
+				this$1._subLayers[googleLayerName] = googleLayer;
+			});
+			return this;
+		},
+
+		// 🍂method removeGoogleLayer(name: String): this
+		// Removes layer with the given name from the google Map instance.
+		removeGoogleLayer: function (googleLayerName) {
+			var this$1 = this;
+
+			this.whenReady(function () {
+				var googleLayer = this$1._subLayers && this$1._subLayers[googleLayerName];
+				if (googleLayer) {
+					googleLayer.setMap(null);
+					delete this$1._subLayers[googleLayerName];
+				}
+			});
+			return this;
+		},
+
+		_initMutantContainer: function () {
+			if (!this._mutantContainer) {
+				this._mutantContainer = L.DomUtil.create(
+					"div",
+					"leaflet-google-mutant leaflet-top leaflet-left"
+				);
+				this._mutantContainer.id = "_MutantContainer_" + L.Util.stamp(this._mutantContainer);
+				this._mutantContainer.style.pointerEvents = "none";
+				this._mutantContainer.style.visibility = "hidden";
+
+				L.DomEvent.off(this._mutantContainer);
+			}
+			this._map.getContainer().appendChild(this._mutantContainer);
+
+			this.setOpacity(this.options.opacity);
+			var style = this._mutantContainer.style;
+			if (this._map.options.zoomSnap < 1) {
+				// Fractional zoom needs a bigger mutant container in order to load more (smaller) tiles
+				style.width = "180%";
+				style.height = "180%";
+			} else {
+				style.width = "100%";
+				style.height = "100%";
+			}
+			style.zIndex = -1;
+
+			this._attachObserver(this._mutantContainer);
+		},
+
+		_initMutant: function () {
+			if (this._mutant) {
+				return;
+			}
+
+			var map = new google.maps.Map(this._mutantContainer, {
+				center: { lat: 0, lng: 0 },
+				zoom: 0,
+				tilt: 0,
+				mapTypeId: this.options.type,
+				disableDefaultUI: true,
+				keyboardShortcuts: false,
+				draggable: false,
+				disableDoubleClickZoom: true,
+				scrollwheel: false,
+				styles: this.options.styles || [],
+				backgroundColor: "transparent",
+			});
+
+			this._mutant = map;
+
+			this._update();
+
+			// 🍂event spawned
+			// Fired when the mutant has been created.
+			this.fire("spawned", { mapObject: map });
+
+			this._waitControls();
+			this.once('controls_ready', this._setupAttribution);
+		},
+
+		_attachObserver: function _attachObserver(node) {
+			if (!this._observer) { this._observer = new MutationObserver(this._onMutations.bind(this)); }
+
+			// pass in the target node, as well as the observer options
+			this._observer.observe(node, { childList: true, subtree: true });
+
+			// if we are reusing an old _mutantContainer, we must manually detect
+			// all existing tiles in it
+			Array.prototype.forEach.call(node.querySelectorAll("img"), this._boundOnMutatedImage);
+		},
+
+		_waitControls: function () {
+			var this$1 = this;
+
+			var id = setInterval(function () {
+				var layoutManager = this$1._mutant.__gm.layoutManager;
+				if (!layoutManager) { return; }
+				clearInterval(id);
+				var positions;
+				// iterate through obfuscated key names to find positions set (atm: layoutManager.o)
+				Object.keys(layoutManager).forEach(function(key) {
+					var el = layoutManager[key];
+					if (el.get) {
+						if (el.get(1) instanceof Node) {
+							positions = el;
+						}
+					}
+				});
+				// 🍂event controls_ready
+				// Fired when controls positions get available (passed in `positions` property).
+				this$1.fire("controls_ready", { positions: positions });
+			}, 50);
+		},
+
+		_setupAttribution: function (ev) {
+			// https://developers.google.com/maps/documentation/javascript/reference/control#ControlPosition
+			var pos = google.maps.ControlPosition;
+			var ctr = this._attributionContainer = ev.positions.get(pos.BOTTOM_RIGHT);
+			L.DomUtil.addClass(ctr, "leaflet-control leaflet-control-attribution");
+			L.DomEvent.disableClickPropagation(ctr);
+			ctr.style.height = "14px";
+			this._map._controlCorners.bottomright.appendChild(ctr);
+
+			this._logoContainer = ev.positions.get(pos.BOTTOM_LEFT);
+			this._logoContainer.style.pointerEvents = "auto";
+			this._map._controlCorners.bottomleft.appendChild(this._logoContainer);
+		},
+
+		_onMutations: function _onMutations(mutations) {
+			for (var i = 0; i < mutations.length; ++i) {
+				var mutation = mutations[i];
+				for (var j = 0; j < mutation.addedNodes.length; ++j) {
+					var node = mutation.addedNodes[j];
+
+					if (node instanceof HTMLImageElement) {
+						this._onMutatedImage(node);
+					} else if (node instanceof HTMLElement) {
+						Array.prototype.forEach.call(
+							node.querySelectorAll("img"),
+							this._boundOnMutatedImage
+						);
+					}
+				}
+			}
+		},
+
+		// Only images which 'src' attrib match this will be considered for moving around.
+		// Looks like some kind of string-based protobuf, maybe??
+		// Only the roads (and terrain, and vector-based stuff) match this pattern
+		_roadRegexp: /!1i(\d+)!2i(\d+)!3i(\d+)!/,
+
+		// On the other hand, raster imagery matches this other pattern
+		_satRegexp: /x=(\d+)&y=(\d+)&z=(\d+)/,
+
+		// On small viewports, when zooming in/out, a static image is requested
+		// This will not be moved around, just removed from the DOM.
+		_staticRegExp: /StaticMapService\.GetMapImage/,
+
+		_onMutatedImage: function _onMutatedImage(imgNode) {
+			var coords;
+			var match = imgNode.src.match(this._roadRegexp);
+			var sublayer = 0;
+
+			if (match) {
+				coords = {
+					z: match[1],
+					x: match[2],
+					y: match[3],
+				};
+				if (this._imagesPerTile > 1) {
+					imgNode.style.zIndex = 1;
+					sublayer = 1;
+				}
+			} else {
+				match = imgNode.src.match(this._satRegexp);
+				if (match) {
+					coords = {
+						x: match[1],
+						y: match[2],
+						z: match[3],
+					};
+				}
+				// imgNode.style.zIndex = 0;
+				sublayer = 0;
+			}
+
+			if (coords) {
+				var tileKey = this._tileCoordsToKey(coords);
+				imgNode.style.position = "absolute";
+
+				var key = tileKey + "/" + sublayer;
+				// Cache img so it can also be used in subsequent tile requests
+				this._lru.set(key, imgNode);
+
+				if (key in this._tileCallbacks && this._tileCallbacks[key]) {
+					// Use the tile for *all* pending callbacks. They'll be cloned anyway.
+					this._tileCallbacks[key].forEach(function (callback) { return callback(imgNode); });
+					delete this._tileCallbacks[key];
+				}
+			}
+		},
+
+		createTile: function (coords, done) {
+			var key = this._tileCoordsToKey(coords),
+				tileContainer = L.DomUtil.create("div");
+
+			tileContainer.style.textAlign = "left";
+			tileContainer.dataset.pending = this._imagesPerTile;
+			done = done.bind(this, null, tileContainer);
+
+			for (var i = 0; i < this._imagesPerTile; ++i) {
+				var key2 = key + "/" + i,
+					imgNode = this._lru.get(key2);
+				if (imgNode) {
+					tileContainer.appendChild(this._clone(imgNode));
+					--tileContainer.dataset.pending;
+				} else {
+					this._tileCallbacks[key2] = this._tileCallbacks[key2] || [];
+					this._tileCallbacks[key2].push(
+						function (c /*, k2*/) {
+							return function (imgNode) {
+								c.appendChild(this._clone(imgNode));
+								--c.dataset.pending;
+								if (!parseInt(c.dataset.pending)) {
+									done();
+								}
+							}.bind(this);
+						}.bind(this)(tileContainer /*, key2*/)
+					);
+				}
+			}
+
+			if (!parseInt(tileContainer.dataset.pending)) {
+				L.Util.requestAnimFrame(done);
+			}
+			return tileContainer;
+		},
+
+		_clone: function (imgNode) {
+			var clonedImgNode = imgNode.cloneNode(true);
+			clonedImgNode.style.visibility = "visible";
+			return clonedImgNode;
+		},
+
+		_checkZoomLevels: function () {
+			//setting the zoom level on the Google map may result in a different zoom level than the one requested
+			//(it won't go beyond the level for which they have data).
+			var zoomLevel = this._map.getZoom(),
+				gMapZoomLevel = this._mutant.getZoom();
+
+			if (!zoomLevel || !gMapZoomLevel) { return; }
+
+			if (
+				gMapZoomLevel !== zoomLevel || //zoom levels are out of sync, Google doesn't have data
+				gMapZoomLevel > this.options.maxNativeZoom
+			) {
+				//at current location, Google does have data (contrary to maxNativeZoom)
+				//Update maxNativeZoom
+				this._setMaxNativeZoom(gMapZoomLevel);
+			}
+		},
+
+		_setMaxNativeZoom: function (zoomLevel) {
+			if (zoomLevel !== this.options.maxNativeZoom) {
+				this.options.maxNativeZoom = zoomLevel;
+				this._resetView();
+			}
+		},
+
+		_update: function (center) {
+			// zoom level check needs to happen before super's implementation (tile addition/creation)
+			// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
+			if (this._mutant) {
+				center = center || this._map.getCenter();
+				var _center = new google.maps.LatLng(center.lat, center.lng),
+					zoom = Math.round(this._map.getZoom()),
+					mutantZoom = this._mutant.getZoom();
+
+				this._mutant.setCenter(_center);
+
+				//ignore fractional zoom levels
+				if (zoom !== mutantZoom) {
+					this._mutant.setZoom(zoom);
+
+					if (this._mutantIsReady) { this._checkZoomLevels(); }
+					//else zoom level check will be done later by 'idle' handler
+				}
+			}
+
+			L.GridLayer.prototype._update.call(this, center);
+		},
+
+		// @method whenReady(fn: Function, context?: Object): this
+		// Runs the given function `fn` when the mutant gets initialized, or immediately
+		// if it's already initialized, optionally passing a function context.
+		whenReady: function (callback, context) {
+			if (this._mutant) {
+				callback.call(context || this, { target: this });
+			} else {
+				this.on("spawned", callback, context);
+			}
+			return this;
+		},
+	});
+
+	// 🍂factory gridLayer.googleMutant(options)
+	// Returns a new `GridLayer.GoogleMutant` given its options
+	L.gridLayer.googleMutant = function (options) {
+		return new L.GridLayer.GoogleMutant(options);
+	};
+
+}());
+//# sourceMappingURL=Leaflet.GoogleMutant.js.map
+
 
 /***/ }),
 
@@ -15145,6 +16009,85 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/react-leaflet-google-layer/lib/index.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/react-leaflet-google-layer/lib/index.js ***!
+  \**************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var L = __importStar(__webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js"));
+var core_1 = __webpack_require__(/*! @react-leaflet/core */ "./node_modules/@react-leaflet/core/lib/index.js");
+__webpack_require__(/*! leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant */ "./node_modules/leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js");
+var js_api_loader_1 = __webpack_require__(/*! @googlemaps/js-api-loader */ "./node_modules/@googlemaps/js-api-loader/dist/index.mjs");
+var googleMapsScriptLoaded = false;
+var createLeafletElement = function (props, context) {
+    var _a = props.apiKey, apiKey = _a === void 0 ? '' : _a, _b = props.useGoogMapsLoader, useGoogMapsLoader = _b === void 0 ? true : _b, _c = props.googleMapsLoaderConf, googleMapsLoaderConf = _c === void 0 ? {} : _c, googleMapsAddLayers = props.googleMapsAddLayers, googleMutantProps = __rest(props, ["apiKey", "useGoogMapsLoader", "googleMapsLoaderConf", "googleMapsAddLayers"]);
+    if (useGoogMapsLoader && !googleMapsScriptLoaded) {
+        var loader = new js_api_loader_1.Loader(__assign({ apiKey: apiKey }, googleMapsLoaderConf));
+        loader.load();
+        googleMapsScriptLoaded = true;
+    }
+    var instance = L.gridLayer.googleMutant(googleMutantProps);
+    if (googleMapsAddLayers) {
+        googleMapsAddLayers.forEach(function (layer) {
+            instance.addGoogleLayer(layer.name, layer.options);
+        });
+    }
+    return { instance: instance, context: context };
+};
+exports["default"] = (0, core_1.createLayerComponent)(createLeafletElement, core_1.updateGridLayer);
+
+
+/***/ }),
+
 /***/ "react":
 /*!************************!*\
   !*** external "React" ***!
@@ -15233,6 +16176,432 @@ module.exports = window["wp"]["i18n"];
 
 /***/ }),
 
+/***/ "./node_modules/@googlemaps/js-api-loader/dist/index.mjs":
+/*!***************************************************************!*\
+  !*** ./node_modules/@googlemaps/js-api-loader/dist/index.mjs ***!
+  \***************************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DEFAULT_ID: () => (/* binding */ DEFAULT_ID),
+/* harmony export */   Loader: () => (/* binding */ Loader),
+/* harmony export */   LoaderStatus: () => (/* binding */ LoaderStatus)
+/* harmony export */ });
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol */
+
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+function getDefaultExportFromCjs (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
+// do not edit .js files directly - edit src/index.jst
+
+
+
+var fastDeepEqual = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    if (a.constructor !== b.constructor) return false;
+
+    var length, i, keys;
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+
+
+
+    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+    keys = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+
+    for (i = length; i-- !== 0;)
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      var key = keys[i];
+
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  // true if both NaN, false otherwise
+  return a!==a && b!==b;
+};
+
+var isEqual = /*@__PURE__*/getDefaultExportFromCjs(fastDeepEqual);
+
+/**
+ * Copyright 2019 Google LLC. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at.
+ *
+ *      Http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+const DEFAULT_ID = "__googleMapsScriptId";
+/**
+ * The status of the [[Loader]].
+ */
+var LoaderStatus;
+(function (LoaderStatus) {
+    LoaderStatus[LoaderStatus["INITIALIZED"] = 0] = "INITIALIZED";
+    LoaderStatus[LoaderStatus["LOADING"] = 1] = "LOADING";
+    LoaderStatus[LoaderStatus["SUCCESS"] = 2] = "SUCCESS";
+    LoaderStatus[LoaderStatus["FAILURE"] = 3] = "FAILURE";
+})(LoaderStatus || (LoaderStatus = {}));
+/**
+ * [[Loader]] makes it easier to add Google Maps JavaScript API to your application
+ * dynamically using
+ * [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+ * It works by dynamically creating and appending a script node to the the
+ * document head and wrapping the callback function so as to return a promise.
+ *
+ * ```
+ * const loader = new Loader({
+ *   apiKey: "",
+ *   version: "weekly",
+ *   libraries: ["places"]
+ * });
+ *
+ * loader.load().then((google) => {
+ *   const map = new google.maps.Map(...)
+ * })
+ * ```
+ */
+class Loader {
+    /**
+     * Creates an instance of Loader using [[LoaderOptions]]. No defaults are set
+     * using this library, instead the defaults are set by the Google Maps
+     * JavaScript API server.
+     *
+     * ```
+     * const loader = Loader({apiKey, version: 'weekly', libraries: ['places']});
+     * ```
+     */
+    constructor({ apiKey, authReferrerPolicy, channel, client, id = DEFAULT_ID, language, libraries = [], mapIds, nonce, region, retries = 3, url = "https://maps.googleapis.com/maps/api/js", version, }) {
+        this.callbacks = [];
+        this.done = false;
+        this.loading = false;
+        this.errors = [];
+        this.apiKey = apiKey;
+        this.authReferrerPolicy = authReferrerPolicy;
+        this.channel = channel;
+        this.client = client;
+        this.id = id || DEFAULT_ID; // Do not allow empty string
+        this.language = language;
+        this.libraries = libraries;
+        this.mapIds = mapIds;
+        this.nonce = nonce;
+        this.region = region;
+        this.retries = retries;
+        this.url = url;
+        this.version = version;
+        if (Loader.instance) {
+            if (!isEqual(this.options, Loader.instance.options)) {
+                throw new Error(`Loader must not be called again with different options. ${JSON.stringify(this.options)} !== ${JSON.stringify(Loader.instance.options)}`);
+            }
+            return Loader.instance;
+        }
+        Loader.instance = this;
+    }
+    get options() {
+        return {
+            version: this.version,
+            apiKey: this.apiKey,
+            channel: this.channel,
+            client: this.client,
+            id: this.id,
+            libraries: this.libraries,
+            language: this.language,
+            region: this.region,
+            mapIds: this.mapIds,
+            nonce: this.nonce,
+            url: this.url,
+            authReferrerPolicy: this.authReferrerPolicy,
+        };
+    }
+    get status() {
+        if (this.errors.length) {
+            return LoaderStatus.FAILURE;
+        }
+        if (this.done) {
+            return LoaderStatus.SUCCESS;
+        }
+        if (this.loading) {
+            return LoaderStatus.LOADING;
+        }
+        return LoaderStatus.INITIALIZED;
+    }
+    get failed() {
+        return this.done && !this.loading && this.errors.length >= this.retries + 1;
+    }
+    /**
+     * CreateUrl returns the Google Maps JavaScript API script url given the [[LoaderOptions]].
+     *
+     * @ignore
+     * @deprecated
+     */
+    createUrl() {
+        let url = this.url;
+        url += `?callback=__googleMapsCallback&loading=async`;
+        if (this.apiKey) {
+            url += `&key=${this.apiKey}`;
+        }
+        if (this.channel) {
+            url += `&channel=${this.channel}`;
+        }
+        if (this.client) {
+            url += `&client=${this.client}`;
+        }
+        if (this.libraries.length > 0) {
+            url += `&libraries=${this.libraries.join(",")}`;
+        }
+        if (this.language) {
+            url += `&language=${this.language}`;
+        }
+        if (this.region) {
+            url += `&region=${this.region}`;
+        }
+        if (this.version) {
+            url += `&v=${this.version}`;
+        }
+        if (this.mapIds) {
+            url += `&map_ids=${this.mapIds.join(",")}`;
+        }
+        if (this.authReferrerPolicy) {
+            url += `&auth_referrer_policy=${this.authReferrerPolicy}`;
+        }
+        return url;
+    }
+    deleteScript() {
+        const script = document.getElementById(this.id);
+        if (script) {
+            script.remove();
+        }
+    }
+    /**
+     * Load the Google Maps JavaScript API script and return a Promise.
+     * @deprecated, use importLibrary() instead.
+     */
+    load() {
+        return this.loadPromise();
+    }
+    /**
+     * Load the Google Maps JavaScript API script and return a Promise.
+     *
+     * @ignore
+     * @deprecated, use importLibrary() instead.
+     */
+    loadPromise() {
+        return new Promise((resolve, reject) => {
+            this.loadCallback((err) => {
+                if (!err) {
+                    resolve(window.google);
+                }
+                else {
+                    reject(err.error);
+                }
+            });
+        });
+    }
+    importLibrary(name) {
+        this.execute();
+        return google.maps.importLibrary(name);
+    }
+    /**
+     * Load the Google Maps JavaScript API script with a callback.
+     * @deprecated, use importLibrary() instead.
+     */
+    loadCallback(fn) {
+        this.callbacks.push(fn);
+        this.execute();
+    }
+    /**
+     * Set the script on document.
+     */
+    setScript() {
+        var _a, _b;
+        if (document.getElementById(this.id)) {
+            // TODO wrap onerror callback for cases where the script was loaded elsewhere
+            this.callback();
+            return;
+        }
+        const params = {
+            key: this.apiKey,
+            channel: this.channel,
+            client: this.client,
+            libraries: this.libraries.length && this.libraries,
+            v: this.version,
+            mapIds: this.mapIds,
+            language: this.language,
+            region: this.region,
+            authReferrerPolicy: this.authReferrerPolicy,
+        };
+        // keep the URL minimal:
+        Object.keys(params).forEach(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (key) => !params[key] && delete params[key]);
+        if (!((_b = (_a = window === null || window === void 0 ? void 0 : window.google) === null || _a === void 0 ? void 0 : _a.maps) === null || _b === void 0 ? void 0 : _b.importLibrary)) {
+            // tweaked copy of https://developers.google.com/maps/documentation/javascript/load-maps-js-api#dynamic-library-import
+            // which also sets the base url, the id, and the nonce
+            /* eslint-disable */
+            ((g) => {
+                // @ts-ignore
+                let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window;
+                // @ts-ignore
+                b = b[c] || (b[c] = {});
+                // @ts-ignore
+                const d = b.maps || (b.maps = {}), r = new Set(), e = new URLSearchParams(), u = () => 
+                // @ts-ignore
+                h || (h = new Promise((f, n) => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
+                    yield (a = m.createElement("script"));
+                    a.id = this.id;
+                    e.set("libraries", [...r] + "");
+                    // @ts-ignore
+                    for (k in g)
+                        e.set(k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = this.url + `?` + e;
+                    d[q] = f;
+                    a.onerror = () => (h = n(Error(p + " could not load.")));
+                    // @ts-ignore
+                    a.nonce = this.nonce || ((_a = m.querySelector("script[nonce]")) === null || _a === void 0 ? void 0 : _a.nonce) || "";
+                    m.head.append(a);
+                })));
+                // @ts-ignore
+                d[l] ? console.warn(p + " only loads once. Ignoring:", g) : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+            })(params);
+            /* eslint-enable */
+        }
+        // While most libraries populate the global namespace when loaded via bootstrap params,
+        // this is not the case for "marker" when used with the inline bootstrap loader
+        // (and maybe others in the future). So ensure there is an importLibrary for each:
+        const libraryPromises = this.libraries.map((library) => this.importLibrary(library));
+        // ensure at least one library, to kick off loading...
+        if (!libraryPromises.length) {
+            libraryPromises.push(this.importLibrary("core"));
+        }
+        Promise.all(libraryPromises).then(() => this.callback(), (error) => {
+            const event = new ErrorEvent("error", { error }); // for backwards compat
+            this.loadErrorCallback(event);
+        });
+    }
+    /**
+     * Reset the loader state.
+     */
+    reset() {
+        this.deleteScript();
+        this.done = false;
+        this.loading = false;
+        this.errors = [];
+        this.onerrorEvent = null;
+    }
+    resetIfRetryingFailed() {
+        if (this.failed) {
+            this.reset();
+        }
+    }
+    loadErrorCallback(e) {
+        this.errors.push(e);
+        if (this.errors.length <= this.retries) {
+            const delay = this.errors.length * Math.pow(2, this.errors.length);
+            console.error(`Failed to load Google Maps script, retrying in ${delay} ms.`);
+            setTimeout(() => {
+                this.deleteScript();
+                this.setScript();
+            }, delay);
+        }
+        else {
+            this.onerrorEvent = e;
+            this.callback();
+        }
+    }
+    callback() {
+        this.done = true;
+        this.loading = false;
+        this.callbacks.forEach((cb) => {
+            cb(this.onerrorEvent);
+        });
+        this.callbacks = [];
+    }
+    execute() {
+        this.resetIfRetryingFailed();
+        if (this.done) {
+            this.callback();
+        }
+        else {
+            // short circuit and warn if google.maps is already loaded
+            if (window.google && window.google.maps && window.google.maps.version) {
+                console.warn("Google Maps already loaded outside @googlemaps/js-api-loader." +
+                    "This may result in undesirable behavior as options and script parameters may not match.");
+                this.callback();
+                return;
+            }
+            if (this.loading) ;
+            else {
+                this.loading = true;
+                this.setScript();
+            }
+        }
+    }
+}
+
+
+//# sourceMappingURL=index.mjs.map
+
+
+/***/ }),
+
 /***/ "./node_modules/@react-leaflet/core/lib/attribution.js":
 /*!*************************************************************!*\
   !*** ./node_modules/@react-leaflet/core/lib/attribution.js ***!
@@ -15262,6 +16631,29 @@ function useAttribution(map, attribution) {
         map,
         attribution
     ]);
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@react-leaflet/core/lib/circle.js":
+/*!********************************************************!*\
+  !*** ./node_modules/@react-leaflet/core/lib/circle.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   updateCircle: () => (/* binding */ updateCircle)
+/* harmony export */ });
+function updateCircle(layer, props, prevProps) {
+    if (props.center !== prevProps.center) {
+        layer.setLatLng(props.center);
+    }
+    if (props.radius != null && props.radius !== prevProps.radius) {
+        layer.setRadius(props.radius);
+    }
 }
 
 
@@ -15452,6 +16844,48 @@ function createDivOverlayHook(useElement, useLifecycle) {
 
 /***/ }),
 
+/***/ "./node_modules/@react-leaflet/core/lib/dom.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/@react-leaflet/core/lib/dom.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addClassName: () => (/* binding */ addClassName),
+/* harmony export */   removeClassName: () => (/* binding */ removeClassName),
+/* harmony export */   updateClassName: () => (/* binding */ updateClassName)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+
+function splitClassName(className) {
+    return className.split(' ').filter(Boolean);
+}
+function addClassName(element, className) {
+    splitClassName(className).forEach((cls)=>{
+        leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.addClass(element, cls);
+    });
+}
+function removeClassName(element, className) {
+    splitClassName(className).forEach((cls)=>{
+        leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.removeClass(element, cls);
+    });
+}
+function updateClassName(element, prevClassName, nextClassName) {
+    if (element != null && nextClassName !== prevClassName) {
+        if (prevClassName != null && prevClassName.length > 0) {
+            removeClassName(element, prevClassName);
+        }
+        if (nextClassName != null && nextClassName.length > 0) {
+            addClassName(element, nextClassName);
+        }
+    }
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/@react-leaflet/core/lib/element.js":
 /*!*********************************************************!*\
   !*** ./node_modules/@react-leaflet/core/lib/element.js ***!
@@ -15621,6 +17055,81 @@ function updateGridLayer(layer, props, prevProps) {
 
 /***/ }),
 
+/***/ "./node_modules/@react-leaflet/core/lib/index.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/@react-leaflet/core/lib/index.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CONTEXT_VERSION: () => (/* reexport safe */ _context_js__WEBPACK_IMPORTED_MODULE_3__.CONTEXT_VERSION),
+/* harmony export */   LeafletContext: () => (/* reexport safe */ _context_js__WEBPACK_IMPORTED_MODULE_3__.LeafletContext),
+/* harmony export */   LeafletProvider: () => (/* reexport safe */ _context_js__WEBPACK_IMPORTED_MODULE_3__.LeafletProvider),
+/* harmony export */   addClassName: () => (/* reexport safe */ _dom_js__WEBPACK_IMPORTED_MODULE_6__.addClassName),
+/* harmony export */   createContainerComponent: () => (/* reexport safe */ _component_js__WEBPACK_IMPORTED_MODULE_2__.createContainerComponent),
+/* harmony export */   createControlComponent: () => (/* reexport safe */ _generic_js__WEBPACK_IMPORTED_MODULE_9__.createControlComponent),
+/* harmony export */   createControlHook: () => (/* reexport safe */ _control_js__WEBPACK_IMPORTED_MODULE_4__.createControlHook),
+/* harmony export */   createDivOverlayComponent: () => (/* reexport safe */ _component_js__WEBPACK_IMPORTED_MODULE_2__.createDivOverlayComponent),
+/* harmony export */   createDivOverlayHook: () => (/* reexport safe */ _div_overlay_js__WEBPACK_IMPORTED_MODULE_5__.createDivOverlayHook),
+/* harmony export */   createElementHook: () => (/* reexport safe */ _element_js__WEBPACK_IMPORTED_MODULE_7__.createElementHook),
+/* harmony export */   createElementObject: () => (/* reexport safe */ _element_js__WEBPACK_IMPORTED_MODULE_7__.createElementObject),
+/* harmony export */   createLayerComponent: () => (/* reexport safe */ _generic_js__WEBPACK_IMPORTED_MODULE_9__.createLayerComponent),
+/* harmony export */   createLayerHook: () => (/* reexport safe */ _layer_js__WEBPACK_IMPORTED_MODULE_11__.createLayerHook),
+/* harmony export */   createLeafComponent: () => (/* reexport safe */ _component_js__WEBPACK_IMPORTED_MODULE_2__.createLeafComponent),
+/* harmony export */   createLeafletContext: () => (/* reexport safe */ _context_js__WEBPACK_IMPORTED_MODULE_3__.createLeafletContext),
+/* harmony export */   createOverlayComponent: () => (/* reexport safe */ _generic_js__WEBPACK_IMPORTED_MODULE_9__.createOverlayComponent),
+/* harmony export */   createPathComponent: () => (/* reexport safe */ _generic_js__WEBPACK_IMPORTED_MODULE_9__.createPathComponent),
+/* harmony export */   createPathHook: () => (/* reexport safe */ _path_js__WEBPACK_IMPORTED_MODULE_14__.createPathHook),
+/* harmony export */   createTileLayerComponent: () => (/* reexport safe */ _generic_js__WEBPACK_IMPORTED_MODULE_9__.createTileLayerComponent),
+/* harmony export */   extendContext: () => (/* reexport safe */ _context_js__WEBPACK_IMPORTED_MODULE_3__.extendContext),
+/* harmony export */   removeClassName: () => (/* reexport safe */ _dom_js__WEBPACK_IMPORTED_MODULE_6__.removeClassName),
+/* harmony export */   updateCircle: () => (/* reexport safe */ _circle_js__WEBPACK_IMPORTED_MODULE_1__.updateCircle),
+/* harmony export */   updateClassName: () => (/* reexport safe */ _dom_js__WEBPACK_IMPORTED_MODULE_6__.updateClassName),
+/* harmony export */   updateGridLayer: () => (/* reexport safe */ _grid_layer_js__WEBPACK_IMPORTED_MODULE_10__.updateGridLayer),
+/* harmony export */   updateMediaOverlay: () => (/* reexport safe */ _media_overlay_js__WEBPACK_IMPORTED_MODULE_12__.updateMediaOverlay),
+/* harmony export */   useAttribution: () => (/* reexport safe */ _attribution_js__WEBPACK_IMPORTED_MODULE_0__.useAttribution),
+/* harmony export */   useEventHandlers: () => (/* reexport safe */ _events_js__WEBPACK_IMPORTED_MODULE_8__.useEventHandlers),
+/* harmony export */   useLayerLifecycle: () => (/* reexport safe */ _layer_js__WEBPACK_IMPORTED_MODULE_11__.useLayerLifecycle),
+/* harmony export */   useLeafletContext: () => (/* reexport safe */ _context_js__WEBPACK_IMPORTED_MODULE_3__.useLeafletContext),
+/* harmony export */   usePathOptions: () => (/* reexport safe */ _path_js__WEBPACK_IMPORTED_MODULE_14__.usePathOptions),
+/* harmony export */   withPane: () => (/* reexport safe */ _pane_js__WEBPACK_IMPORTED_MODULE_13__.withPane)
+/* harmony export */ });
+/* harmony import */ var _attribution_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./attribution.js */ "./node_modules/@react-leaflet/core/lib/attribution.js");
+/* harmony import */ var _circle_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./circle.js */ "./node_modules/@react-leaflet/core/lib/circle.js");
+/* harmony import */ var _component_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./component.js */ "./node_modules/@react-leaflet/core/lib/component.js");
+/* harmony import */ var _context_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./context.js */ "./node_modules/@react-leaflet/core/lib/context.js");
+/* harmony import */ var _control_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./control.js */ "./node_modules/@react-leaflet/core/lib/control.js");
+/* harmony import */ var _div_overlay_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./div-overlay.js */ "./node_modules/@react-leaflet/core/lib/div-overlay.js");
+/* harmony import */ var _dom_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./dom.js */ "./node_modules/@react-leaflet/core/lib/dom.js");
+/* harmony import */ var _element_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./element.js */ "./node_modules/@react-leaflet/core/lib/element.js");
+/* harmony import */ var _events_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./events.js */ "./node_modules/@react-leaflet/core/lib/events.js");
+/* harmony import */ var _generic_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./generic.js */ "./node_modules/@react-leaflet/core/lib/generic.js");
+/* harmony import */ var _grid_layer_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./grid-layer.js */ "./node_modules/@react-leaflet/core/lib/grid-layer.js");
+/* harmony import */ var _layer_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layer.js */ "./node_modules/@react-leaflet/core/lib/layer.js");
+/* harmony import */ var _media_overlay_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./media-overlay.js */ "./node_modules/@react-leaflet/core/lib/media-overlay.js");
+/* harmony import */ var _pane_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./pane.js */ "./node_modules/@react-leaflet/core/lib/pane.js");
+/* harmony import */ var _path_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./path.js */ "./node_modules/@react-leaflet/core/lib/path.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
 /***/ "./node_modules/@react-leaflet/core/lib/layer.js":
 /*!*******************************************************!*\
   !*** ./node_modules/@react-leaflet/core/lib/layer.js ***!
@@ -15665,6 +17174,35 @@ function createLayerHook(useElement) {
         useLayerLifecycle(elementRef.current, context);
         return elementRef;
     };
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@react-leaflet/core/lib/media-overlay.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/@react-leaflet/core/lib/media-overlay.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   updateMediaOverlay: () => (/* binding */ updateMediaOverlay)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+
+function updateMediaOverlay(overlay, props, prevProps) {
+    if (props.bounds instanceof leaflet__WEBPACK_IMPORTED_MODULE_0__.LatLngBounds && props.bounds !== prevProps.bounds) {
+        overlay.setBounds(props.bounds);
+    }
+    if (props.opacity != null && props.opacity !== prevProps.opacity) {
+        overlay.setOpacity(props.opacity);
+    }
+    if (props.zIndex != null && props.zIndex !== prevProps.zIndex) {
+        // @ts-ignore missing in definition but inherited from ImageOverlay
+        overlay.setZIndex(props.zIndex);
+    }
 }
 
 

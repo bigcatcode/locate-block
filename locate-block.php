@@ -110,7 +110,7 @@ function register_locateandfiltermap_custom_fields() {
             'schema'          => null,
         )
     );
-	
+
 }
 
 function get_locateandfiltermap_custom_field_value($object, $field_name, $request) {
@@ -156,3 +156,19 @@ function get_custom_cache_file($request) {
     }
 }
 
+add_action('rest_api_init', function() {
+    register_rest_route('custom/v1', '/map-options', array(
+        'methods' => 'GET',
+        'callback' => 'get_map_options',
+    ));
+});
+
+function get_map_options() {
+    $googlemaps_key = unserialize(get_option('locate-anything-option-googlemaps-key'));
+    $enable_marker_bouncing_js = unserialize(get_option('locate-anything-option-enable_markerBouncingJS'));
+
+    return rest_ensure_response(array(
+        'googlemaps_key' => $googlemaps_key,
+        'enable_marker_bouncing_js' => $enable_marker_bouncing_js,
+    ));
+}

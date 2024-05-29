@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 import {
@@ -11,6 +11,7 @@ import {
   LayerGroup
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import ReactLeafletGoogleLayer from 'react-leaflet-google-layer';
 
 const { Fragment } = wp.element;
 
@@ -20,12 +21,19 @@ export default function Map({ attributes, setAttributes }){
     const { mapscrollWheelZoom }  = attributes;
     const { mapStartPosition }  = attributes;
     const { mapStartZoom }  = attributes;
+    const { selectedOptionProvider }  = attributes;
 
     const [jsonData, setJsonData] = useState(null);   
     const [width, setWidth] = useState(mapWidth);
     const [height, setHeight] = useState(mapHeight);
+    const { mapOptions  }  = attributes;
+    const [apiKey, setApiKey] = useState(mapOptions);
 
-
+    useEffect(() => {
+        if (mapOptions) {
+            setApiKey(mapOptions.googlemaps_key);
+        }
+    }, [mapOptions]);
 
 	useEffect(() => {
 		if (selectedOptionShortcode) {
@@ -81,41 +89,83 @@ export default function Map({ attributes, setAttributes }){
     }, [mapHeight]);
 
 
+
+    const [currentLayer, setCurrentLayer] = useState(selectedOptionProvider);
+
+    useEffect(() => {
+      setCurrentLayer(selectedOptionProvider);
+    }, [selectedOptionProvider]);
+ 
+    
+    const renderLayer = () => {
+        if (apiKey) {
+            switch (currentLayer) {
+                case 'basic-1':
+                return <ReactLeafletGoogleLayer key='basic-1' type={'terrain'} apiKey={apiKey} />;
+                case 'basic-2':
+                return <ReactLeafletGoogleLayer  key='basic-2' type={'roadmap'} apiKey={apiKey} />;
+                case 'basic-3':
+                return <ReactLeafletGoogleLayer  key='basic-3' type={'satellite'} apiKey={apiKey} />;
+                case 'basic-4':
+                return <ReactLeafletGoogleLayer  key='basic-4' type={'hybrid'} apiKey={apiKey} />;
+                default:
+                return (
+                    <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                );
+            }
+        } else {
+            return (
+                <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                /> 
+            )          
+        }
+    };
+
     return (
         <Fragment>
             {height && mapStartPosition && mapStartZoom && (
-                <MapContainer
-                    key={`${height}${width}`}
-                    center={centerCoordinates}
-                    zoom={mapStartZoom}
-                    scrollWheelZoom={false}
-                    style={{ height: `${height}${mapHeightUnit}`, width: `${width}${mapWidthUnit}` }}
-                    dragging={false}
-                >
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {/* Render Markers */}
-                    {markers && markers.map((marker, index) => (
+                
+                    <MapContainer
+                        key={`${height}${width}`}
+                        center={centerCoordinates}
+                        zoom={mapStartZoom}
+                        scrollWheelZoom={true}
+                        style={{ height: `${height}${mapHeightUnit}`, width: `${width}${mapWidthUnit}` }}
+                        dragging={true}
                         
-                        <Marker 
-                            key={index} 
-                            position={[parseFloat(marker.lat), parseFloat(marker.lng)]}
-                            icon={createIcon( marker?.custom_marker || defaults )}
-                        >
-                            <Popup>
-                                <div>
-                                    <h3>{marker.title}</h3>
-                                    <p>{marker.excerpt}</p>
-                                    {/* You can include other information here */}
-                                </div>
-                            </Popup>
-                        </Marker>
-                    ))}                    
-                </MapContainer>
+                    >
+
+                        {renderLayer()}
+
+                        {/* Render Markers */}
+                        {markers && markers.map((marker, index) => (
+                            
+                            <Marker 
+                                key={index} 
+                                position={[parseFloat(marker.lat), parseFloat(marker.lng)]}
+                                icon={createIcon( marker?.custom_marker || defaults )}
+                            >
+                                <Popup>
+                                    <div>
+                                        <h3>{marker.title}</h3>
+                                        <p>{marker.excerpt}</p>
+                                        {/* You can include other information here */}
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        ))}    
+
+                    </MapContainer>
+                
             )}
         </Fragment>
     )
 
 }
+
+

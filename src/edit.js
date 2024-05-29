@@ -35,6 +35,19 @@ export default function Edit({ attributes, setAttributes }) {
 	  fetchPosts()
 	}, [])
 
+	const [mapOptions, setMapOptions] = useState(null);
+
+    useEffect(() => {
+        const apiUrlOptions = `/custom/v1/map-options`;
+        apiFetch({ path: apiUrlOptions })
+            .then((data) => {
+                setMapOptions(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching JSON data:', error);
+            });
+      }, []); 
+
 	return (
 		<Fragment>
 
@@ -49,7 +62,7 @@ export default function Edit({ attributes, setAttributes }) {
 				
 				{selectedOptionShortcode && (
 					<PanelMapSettings
-						attributes={{ ...attributes, posts }}
+						attributes={{ ...attributes, posts, mapOptions }}
 						setAttributes={(newAttributes) => {
 							setAttributes(newAttributes);
 						}}
@@ -68,7 +81,7 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 				) : (
 					<Map
-						attributes={{ ...attributes }} 
+						attributes={{ ...attributes, mapOptions }} 
 						setAttributes={(newAttributes) => {
 							setAttributes(newAttributes);
 						}}

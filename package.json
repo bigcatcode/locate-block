@@ -22,6 +22,7 @@
 		"@wordpress/element": "^5.35.0",
 		"@wordpress/url": "^3.59.0",
 		"axios": "^1.7.2",
-		"react-leaflet": "^4.2.1"
+		"react-leaflet": "^4.2.1",
+		"react-leaflet-google-layer": "^2.2.0"
 	}
 }

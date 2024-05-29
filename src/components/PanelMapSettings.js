@@ -9,6 +9,7 @@ export default function PanelMapSettings({ attributes, setAttributes }){
     const { mapStartPosition }  = attributes;
     const { mapStartZoom }  = attributes;
 
+
     // Get the locate-anything-map-provider for a specific post ID
     const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
     const mapProviderForPost = currentPostOfMap ? currentPostOfMap['locate-anything-map-provider'] : null;
@@ -67,6 +68,15 @@ export default function PanelMapSettings({ attributes, setAttributes }){
         }
     }, [currentMapStartPosition]);
 
+    const { mapOptions  }  = attributes;
+    const [apiKey, setApiKey] = useState(mapOptions);
+
+    useEffect(() => {
+        if (mapOptions) {
+            setApiKey(mapOptions.googlemaps_key);
+        }
+    }, [mapOptions]);
+
     return (
         <div>
             <PanelBody
@@ -79,11 +89,11 @@ export default function PanelMapSettings({ attributes, setAttributes }){
                     options={ [
                         { value: '', label: 'Select Map Overlay', disabled: true },
                         { value: 'basic-0', label: 'OpenStreetMap' },
-                        { value: 'basic-1', label: 'GoogleMaps TERRAIN' },
-                        { value: 'basic-2', label: 'GoogleMaps ROADMAP' },
-                        { value: 'basic-3', label: 'GoogleMaps SATELLITE' },
-                        { value: 'basic-4', label: 'GoogleMaps HYBRID' },
-                        { value: 'addon-0', label: 'Addon overlays' },
+                        { value: apiKey ? 'basic-1' : '', label: 'GoogleMaps TERRAIN', disabled: !apiKey },
+                        { value: apiKey ? 'basic-2' : '', label: 'GoogleMaps ROADMAP', disabled: !apiKey },
+                        { value: apiKey ? 'basic-3' : '', label: 'GoogleMaps SATELLITE', disabled: !apiKey },
+                        { value: apiKey ? 'basic-4' : '', label: 'GoogleMaps HYBRID', disabled: !apiKey },
+                        { value: 'addon-0', label: 'Addon overlays', disabled: true },
                     ] }
                     onChange={(newOption) => setAttributes({ selectedOptionProvider: newOption })}
                     __nextHasNoMarginBottom
