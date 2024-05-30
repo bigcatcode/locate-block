@@ -8,7 +8,8 @@ import {
   Marker,
   Popup,
   LayersControl,
-  LayerGroup
+  LayerGroup,
+  useMapEvents
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ReactLeafletGoogleLayer from 'react-leaflet-google-layer';
@@ -126,6 +127,23 @@ export default function Map({ attributes, setAttributes }){
         }
     };
 
+    const ZoomHandler = () => {
+        const map = useMapEvents({
+            zoomend: () => {
+                const newZoom = map.getZoom();
+                setAttributes({ mapStartZoom: newZoom });
+            },
+            moveend: () => {
+                const newCenter = map.getCenter();
+                const newCenterCoordinates = `${newCenter.lat},${newCenter.lng}`;
+                setAttributes({ mapStartPosition: newCenterCoordinates });
+            }            
+        });
+        return null;
+    };
+
+
+
     return (
         <Fragment>
             {height && mapStartPosition && mapStartZoom && (
@@ -141,6 +159,8 @@ export default function Map({ attributes, setAttributes }){
                     >
 
                         {renderLayer()}
+
+                        <ZoomHandler />
 
                         {/* Render Markers */}
                         {markers && markers.map((marker, index) => (

@@ -75,9 +75,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/TileLayer.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/MapContainer.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Marker.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Popup.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/hooks.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/MapContainer.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Marker.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Popup.js");
 /* harmony import */ var leaflet_dist_leaflet_css__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! leaflet/dist/leaflet.css */ "./node_modules/leaflet/dist/leaflet.css");
 /* harmony import */ var react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-leaflet-google-layer */ "./node_modules/react-leaflet-google-layer/lib/index.js");
 /* harmony import */ var react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5__);
@@ -217,7 +218,25 @@ function Map({
       });
     }
   };
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_7__.MapContainer, {
+  const ZoomHandler = () => {
+    const map = (0,react_leaflet__WEBPACK_IMPORTED_MODULE_7__.useMapEvents)({
+      zoomend: () => {
+        const newZoom = map.getZoom();
+        setAttributes({
+          mapStartZoom: newZoom
+        });
+      },
+      moveend: () => {
+        const newCenter = map.getCenter();
+        const newCenterCoordinates = `${newCenter.lat},${newCenter.lng}`;
+        setAttributes({
+          mapStartPosition: newCenterCoordinates
+        });
+      }
+    });
+    return null;
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_8__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
     zoom: mapStartZoom,
@@ -227,11 +246,11 @@ function Map({
       width: `${width}${mapWidthUnit}`
     },
     dragging: true
-  }, renderLayer(), markers && markers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_8__.Marker, {
+  }, renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), markers && markers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.Marker, {
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
     icon: createIcon(marker?.custom_marker || defaults)
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_10__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
 }
 
 /***/ }),
@@ -17497,6 +17516,59 @@ const TileLayer = (0,_react_leaflet_core__WEBPACK_IMPORTED_MODULE_1__.createTile
         layer.setUrl(url);
     }
 });
+
+
+/***/ }),
+
+/***/ "./node_modules/react-leaflet/lib/hooks.js":
+/*!*************************************************!*\
+  !*** ./node_modules/react-leaflet/lib/hooks.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useMap: () => (/* binding */ useMap),
+/* harmony export */   useMapEvent: () => (/* binding */ useMapEvent),
+/* harmony export */   useMapEvents: () => (/* binding */ useMapEvents)
+/* harmony export */ });
+/* harmony import */ var _react_leaflet_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @react-leaflet/core */ "./node_modules/@react-leaflet/core/lib/context.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+
+
+function useMap() {
+    return (0,_react_leaflet_core__WEBPACK_IMPORTED_MODULE_1__.useLeafletContext)().map;
+}
+function useMapEvent(type, handler) {
+    const map = useMap();
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function addMapEventHandler() {
+        // @ts-ignore event type
+        map.on(type, handler);
+        return function removeMapEventHandler() {
+            // @ts-ignore event type
+            map.off(type, handler);
+        };
+    }, [
+        map,
+        type,
+        handler
+    ]);
+    return map;
+}
+function useMapEvents(handlers) {
+    const map = useMap();
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function addMapEventHandlers() {
+        map.on(handlers);
+        return function removeMapEventHandlers() {
+            map.off(handlers);
+        };
+    }, [
+        map,
+        handlers
+    ]);
+    return map;
+}
 
 
 /***/ }),
