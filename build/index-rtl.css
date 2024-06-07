@@ -671,3 +671,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .locate_select_shortcode label {
   color: white;
 }
+
+.leaflet-filter-control {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  max-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+}

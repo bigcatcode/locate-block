@@ -1,6 +1,84 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/components/FilterControl.js":
+/*!*****************************************!*\
+  !*** ./src/components/FilterControl.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+const FilterControl = ({
+  filters,
+  selectedFilters,
+  setSelectedFilters
+}) => {
+  const handleFilterChange = (filterKey, option) => {
+    setSelectedFilters(prevFilters => {
+      const newFilters = {
+        ...prevFilters
+      };
+      if (!newFilters[filterKey]) {
+        newFilters[filterKey] = [];
+      }
+      if (newFilters[filterKey].includes(option)) {
+        newFilters[filterKey] = newFilters[filterKey].filter(item => item !== option);
+      } else {
+        newFilters[filterKey].push(option);
+      }
+      return newFilters;
+    });
+  };
+  const getOptionValue = optionValue => {
+    // Remove HTML tags from optionValue
+    const cleanedValue = optionValue.replace(/<\/?[^>]+(>|$)/g, '');
+    return cleanedValue;
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "leaflet-filter-control leaflet-control-layers leaflet-control-layers-expanded leaflet-control",
+    "aria-haspopup": "true",
+    style: {
+      maxHeight: '300px',
+      overflowY: 'auto'
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("section", {
+    className: "leaflet-control-layers-list"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "leaflet-control-layers-base"
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "leaflet-control-layers-separator",
+    style: {
+      display: "none"
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "leaflet-control-layers-overlays"
+  }, Object.entries(filters).map(([filterKey, filterOptions]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    key: filterKey
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, filterKey), Object.entries(filterOptions).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+    key: optionKey
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "checkbox",
+    checked: selectedFilters[filterKey] && selectedFilters[filterKey].includes(optionKey),
+    onClick: () => handleFilterChange(filterKey, optionKey)
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, getOptionValue(optionValue))))))))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FilterControl);
+
+/***/ }),
+
 /***/ "./src/components/LocateSelectShortcode.js":
 /*!*************************************************!*\
   !*** ./src/components/LocateSelectShortcode.js ***!
@@ -74,14 +152,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/TileLayer.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/hooks.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/MapContainer.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Marker.js");
-/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Popup.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/TileLayer.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/hooks.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/MapContainer.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Marker.js");
+/* harmony import */ var react_leaflet__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-leaflet */ "./node_modules/react-leaflet/lib/Popup.js");
 /* harmony import */ var leaflet_dist_leaflet_css__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! leaflet/dist/leaflet.css */ "./node_modules/leaflet/dist/leaflet.css");
 /* harmony import */ var react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-leaflet-google-layer */ "./node_modules/react-leaflet-google-layer/lib/index.js");
 /* harmony import */ var react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_leaflet_google_layer__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _FilterControl__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./FilterControl */ "./src/components/FilterControl.js");
+
 
 
 
@@ -206,20 +286,20 @@ function Map({
             apiKey: apiKey
           });
         default:
-          return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_6__.TileLayer, {
+          return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_7__.TileLayer, {
             attribution: "\xA9 <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
             url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           });
       }
     } else {
-      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_6__.TileLayer, {
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_7__.TileLayer, {
         attribution: "\xA9 <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
         url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       });
     }
   };
   const ZoomHandler = () => {
-    const map = (0,react_leaflet__WEBPACK_IMPORTED_MODULE_7__.useMapEvents)({
+    const map = (0,react_leaflet__WEBPACK_IMPORTED_MODULE_8__.useMapEvents)({
       zoomend: () => {
         const newZoom = map.getZoom();
         setAttributes({
@@ -236,21 +316,44 @@ function Map({
     });
     return null;
   };
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_8__.MapContainer, {
+  const [filters, setFilters] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    if (jsonData) {
+      const filterOptions = Object.keys(jsonData.index).reduce((acc, key) => {
+        if (key !== 'markers' && key !== 'fieldnames') {
+          acc[key] = jsonData.index[key];
+        }
+        return acc;
+      }, {});
+      console.log(filterOptions);
+      setFilters(filterOptions);
+    }
+  }, [jsonData]);
+  const [selectedFilters, setSelectedFilters] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  const filteredMarkers = markers.filter(marker => {
+    return Object.keys(selectedFilters).every(filterKey => {
+      return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+    });
+  });
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
     zoom: mapStartZoom,
-    scrollWheelZoom: true,
+    scrollWheelZoom: false,
     style: {
       height: `${height}${mapHeightUnit}`,
       width: `${width}${mapWidthUnit}`
     },
-    dragging: true
-  }, renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), markers && markers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.Marker, {
+    dragging: false
+  }, renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    filters: filters,
+    selectedFilters: selectedFilters,
+    setSelectedFilters: setSelectedFilters
+  }), filteredMarkers && filteredMarkers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_10__.Marker, {
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
     icon: createIcon(marker?.custom_marker || defaults)
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_10__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_11__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
 }
 
 /***/ }),

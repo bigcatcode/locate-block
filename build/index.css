@@ -672,4 +672,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
   color: white;
 }
 
+.leaflet-filter-control {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  max-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 /*# sourceMappingURL=index.css.map*/

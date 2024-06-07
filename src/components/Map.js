@@ -13,6 +13,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ReactLeafletGoogleLayer from 'react-leaflet-google-layer';
+import FilterControl from "./FilterControl";
 
 const { Fragment } = wp.element;
 
@@ -142,7 +143,28 @@ export default function Map({ attributes, setAttributes }){
         return null;
     };
 
+    const [filters, setFilters] = useState({});
 
+    useEffect(() => {
+        if (jsonData) {
+            const filterOptions = Object.keys(jsonData.index).reduce((acc, key) => {
+                if (key !== 'markers' && key !== 'fieldnames') {
+                    acc[key] = jsonData.index[key];
+                }
+                return acc;
+            }, {});
+            console.log(filterOptions);
+            setFilters(filterOptions);
+        }
+    }, [jsonData]);
+
+    const [selectedFilters, setSelectedFilters] = useState({});
+
+    const filteredMarkers = markers.filter(marker => {
+        return Object.keys(selectedFilters).every(filterKey => {
+            return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+        });
+    });
 
     return (
         <Fragment>
@@ -152,9 +174,9 @@ export default function Map({ attributes, setAttributes }){
                         key={`${height}${width}`}
                         center={centerCoordinates}
                         zoom={mapStartZoom}
-                        scrollWheelZoom={true}
+                        scrollWheelZoom={false}
                         style={{ height: `${height}${mapHeightUnit}`, width: `${width}${mapWidthUnit}` }}
-                        dragging={true}
+                        dragging={false}
                         
                     >
 
@@ -162,13 +184,15 @@ export default function Map({ attributes, setAttributes }){
 
                         <ZoomHandler />
 
+
+                        <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+
                         {/* Render Markers */}
-                        {markers && markers.map((marker, index) => (
-                            
-                            <Marker 
-                                key={index} 
+                        {filteredMarkers && filteredMarkers.map((marker, index) => (
+                            <Marker
+                                key={index}
                                 position={[parseFloat(marker.lat), parseFloat(marker.lng)]}
-                                icon={createIcon( marker?.custom_marker || defaults )}
+                                icon={createIcon(marker?.custom_marker || defaults)}
                             >
                                 <Popup>
                                     <div>
