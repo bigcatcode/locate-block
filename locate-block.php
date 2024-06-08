@@ -182,3 +182,9 @@ function get_map_options() {
         'enable_marker_bouncing_js' => $enable_marker_bouncing_js,
     ));
 }
+
+function enable_show_in_rest_for_all_taxonomies($args, $taxonomy) {
+    $args['show_in_rest'] = true;
+    return $args;
+}
+add_filter('register_taxonomy_args', 'enable_show_in_rest_for_all_taxonomies', 10, 2);

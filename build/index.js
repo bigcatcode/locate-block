@@ -18,14 +18,67 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
+
+
 
 
 
 const FilterControl = ({
   filters,
   selectedFilters,
-  setSelectedFilters
+  setSelectedFilters,
+  displayFilters
 }) => {
+  const [taxonomyLabels, setTaxonomyLabels] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  const [isDataReady, setIsDataReady] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    console.log(displayFilters);
+  }, [displayFilters]);
+
+  // Parse displayFilters keys to remove quotes
+  const parseDisplayFilters = filters => {
+    const parsedFilters = {};
+    for (const key in filters) {
+      if (filters.hasOwnProperty(key)) {
+        const newKey = key.replace(/^'|'$/g, '');
+        parsedFilters[newKey] = filters[key];
+      }
+    }
+    return parsedFilters;
+  };
+  const parsedDisplayFilters = parseDisplayFilters(displayFilters);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    console.log(parsedDisplayFilters);
+  }, [parsedDisplayFilters]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    const fetchTaxonomyLabels = async () => {
+      const promises = Object.keys(filters).map(async filterKey => {
+        try {
+          const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+            path: `/wp/v2/taxonomies/${filterKey}`
+          });
+          const label = response && response.name ? response.name : filterKey;
+          return {
+            [filterKey]: label
+          };
+        } catch (error) {
+          console.error(`Error fetching taxonomy label for ${filterKey}:`, error);
+          return {
+            [filterKey]: filterKey
+          };
+        }
+      });
+      const resolvedLabels = await Promise.all(promises);
+      const mergedLabels = Object.assign({}, ...resolvedLabels);
+      setTaxonomyLabels(mergedLabels);
+      setIsDataReady(true);
+    };
+    fetchTaxonomyLabels();
+  }, [filters]);
   const handleFilterChange = (filterKey, option) => {
     setSelectedFilters(prevFilters => {
       const newFilters = {
@@ -42,11 +95,63 @@ const FilterControl = ({
       return newFilters;
     });
   };
+  const handleSelectChange = (filterKey, option) => {
+    setSelectedFilters(prevFilters => {
+      const newFilters = {
+        ...prevFilters
+      };
+      newFilters[filterKey] = [option];
+      return newFilters;
+    });
+  };
+  const handleRangeChange = (filterKey, value) => {
+    setSelectedFilters(prevFilters => {
+      const newFilters = {
+        ...prevFilters
+      };
+      newFilters[filterKey] = [value];
+      return newFilters;
+    });
+  };
   const getOptionValue = optionValue => {
     // Remove HTML tags from optionValue
     const cleanedValue = optionValue.replace(/<\/?[^>]+(>|$)/g, '');
     return cleanedValue;
   };
+  const shouldDisplayFilter = filterKey => {
+    return parsedDisplayFilters && parsedDisplayFilters[filterKey];
+  };
+  const getFilterType = filterKey => {
+    return parsedDisplayFilters ? parsedDisplayFilters[filterKey] : null;
+  };
+
+  // Get min and max range values for range filters
+  const getRangeValues = filterKey => {
+    const minKey = `locate-anything-min-range-${filterKey}`;
+    const maxKey = `locate-anything-max-range-${filterKey}`;
+    const min = parsedDisplayFilters && parsedDisplayFilters[minKey] ? parseInt(parsedDisplayFilters[minKey], 10) : 0;
+    const max = parsedDisplayFilters && parsedDisplayFilters[maxKey] ? parseInt(parsedDisplayFilters[maxKey], 10) : 100;
+    return {
+      min,
+      max
+    };
+  };
+
+  // Get sort value for each filter from displayFilters
+  const getSortValue = filterKey => {
+    const sortKey = `filter_sort-${filterKey}`;
+    return parsedDisplayFilters && parsedDisplayFilters[sortKey] ? parseInt(parsedDisplayFilters[sortKey], 10) : Infinity;
+  };
+
+  // Sort filters based on sort value
+  const sortedFilters = Object.keys(filters).sort((a, b) => {
+    return getSortValue(a) - getSortValue(b);
+  });
+
+  // Only render the filter controls if data is ready
+  if (!isDataReady || !displayFilters) {
+    return null; // Or some loading indicator
+  }
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "leaflet-filter-control leaflet-control-layers leaflet-control-layers-expanded leaflet-control",
     "aria-haspopup": "true",
@@ -65,9 +170,21 @@ const FilterControl = ({
     }
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "leaflet-control-layers-overlays"
-  }, Object.entries(filters).map(([filterKey, filterOptions]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  }, sortedFilters.map(filterKey => shouldDisplayFilter(filterKey) && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     key: filterKey
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, filterKey), Object.entries(filterOptions).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, taxonomyLabels[filterKey]), getFilterType(filterKey) === 'select' ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
+    value: selectedFilters[filterKey] ? selectedFilters[filterKey][0] : '',
+    onChange: e => handleSelectChange(filterKey, e.target.value)
+  }, Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
+    key: optionKey,
+    value: optionKey
+  }, getOptionValue(optionValue)))) : getFilterType(filterKey) === 'range' ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.RangeControl, {
+    label: taxonomyLabels[filterKey],
+    value: selectedFilters[filterKey] ? selectedFilters[filterKey][0] : getRangeValues(filterKey).min,
+    onChange: value => handleRangeChange(filterKey, value),
+    min: getRangeValues(filterKey).min,
+    max: getRangeValues(filterKey).max
+  }) : Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     key: optionKey
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "checkbox",
@@ -204,6 +321,9 @@ function Map({
     mapOptions
   } = attributes;
   const [apiKey, setApiKey] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(mapOptions);
+  const {
+    displayFilters
+  } = attributes;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (mapOptions) {
       setApiKey(mapOptions.googlemaps_key);
@@ -240,6 +360,9 @@ function Map({
       setMarkers(fetchedMarkers);
     }
   }, [jsonData]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    console.log(markers);
+  }, [markers]);
   const createIcon = markerId => {
     const marker = markersIcon[markerId];
     return L.icon({
@@ -325,14 +448,28 @@ function Map({
         }
         return acc;
       }, {});
-      console.log(filterOptions);
       setFilters(filterOptions);
     }
   }, [jsonData]);
   const [selectedFilters, setSelectedFilters] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+
+  // const filteredMarkers = markers.filter(marker => {
+  //     return Object.keys(selectedFilters).every(filterKey => {
+  //         return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+  //     });
+  // });
+
   const filteredMarkers = markers.filter(marker => {
     return Object.keys(selectedFilters).every(filterKey => {
-      return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+      if (typeof marker[filterKey] === 'string' && marker[filterKey].includes(',')) {
+        // Split the string into an array of values
+        const markerValues = marker[filterKey].split(',');
+        // Check if any of the selected filter values match any of the marker values
+        return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].some(filterValue => markerValues.includes(filterValue));
+      } else {
+        // For single values, perform the inclusion check as before
+        return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+      }
     });
   });
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
@@ -348,7 +485,8 @@ function Map({
   }, renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
     filters: filters,
     selectedFilters: selectedFilters,
-    setSelectedFilters: setSelectedFilters
+    setSelectedFilters: setSelectedFilters,
+    displayFilters: displayFilters
   }), filteredMarkers && filteredMarkers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_10__.Marker, {
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
@@ -440,6 +578,9 @@ function PanelMapSettings({
   const {
     mapStartZoom
   } = attributes;
+  const {
+    displayFilters
+  } = attributes;
 
   // Get the locate-anything-map-provider for a specific post ID
   const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
@@ -448,6 +589,38 @@ function PanelMapSettings({
   const currentMapHeight = currentPostOfMap ? currentPostOfMap['locate-anything-map-height'] : 500;
   const currentMapStartZoom = currentPostOfMap ? currentPostOfMap['locate-anything-start-zoom'] : 5;
   const currentMapStartPosition = currentPostOfMap ? currentPostOfMap['locate-anything-start-position'] : null;
+  const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
+    if (currentDisplayFilters) {
+      const pairs = currentDisplayFilters.split(',');
+      //console.log(pairs);
+      const parsedObject = {};
+      pairs.forEach(pair => {
+        // Split the pair by colon to extract key and value
+        const keyValue = pair.split(':');
+
+        // Check if the pair has at least two elements
+        if (keyValue.length >= 2) {
+          const key = keyValue[0].trim();
+          const value = keyValue.slice(1).join(':').trim();
+
+          // Remove single quotes from the value
+          const sanitizedValue = value.replace(/^'(.*)'$/, '$1');
+
+          // Assign the key-value pair to the object
+          parsedObject[key] = sanitizedValue;
+        } else {
+          //console.error(`Invalid key-value pair: ${pair}`);
+        }
+      });
+      setAttributes({
+        displayFilters: parsedObject
+      });
+    }
+  }, [currentDisplayFilters]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
+    //console.log(currentDisplayFilters);
+  }, [currentDisplayFilters]);
 
   // Set initial value for selectedOptionProvider if not already set
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
@@ -692,6 +865,7 @@ function Edit({
   }) : (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_Map__WEBPACK_IMPORTED_MODULE_8__["default"], {
     attributes: {
       ...attributes,
+      posts,
       mapOptions
     },
     setAttributes: newAttributes => {

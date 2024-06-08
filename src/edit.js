@@ -81,7 +81,7 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 				) : (
 					<Map
-						attributes={{ ...attributes, mapOptions }} 
+						attributes={{ ...attributes, posts, mapOptions }} 
 						setAttributes={(newAttributes) => {
 							setAttributes(newAttributes);
 						}}

@@ -8,6 +8,7 @@ export default function PanelMapSettings({ attributes, setAttributes }){
     const { mapscrollWheelZoom }  = attributes;
     const { mapStartPosition }  = attributes;
     const { mapStartZoom }  = attributes;
+    const { displayFilters}  = attributes;
 
 
     // Get the locate-anything-map-provider for a specific post ID
@@ -17,7 +18,40 @@ export default function PanelMapSettings({ attributes, setAttributes }){
     const currentMapHeight = currentPostOfMap ? currentPostOfMap['locate-anything-map-height'] : 500;
     const currentMapStartZoom = currentPostOfMap ? currentPostOfMap['locate-anything-start-zoom'] : 5;
     const currentMapStartPosition = currentPostOfMap ? currentPostOfMap['locate-anything-start-position'] : null;
-   
+    const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
+
+    useEffect(() => {
+        if (currentDisplayFilters) {
+            const pairs = currentDisplayFilters.split(',');
+            //console.log(pairs);
+            const parsedObject = {};
+
+            pairs.forEach(pair => {
+                // Split the pair by colon to extract key and value
+                const keyValue = pair.split(':');
+                
+                // Check if the pair has at least two elements
+                if (keyValue.length >= 2) {
+                    const key = keyValue[0].trim();
+                    const value = keyValue.slice(1).join(':').trim();
+    
+                    // Remove single quotes from the value
+                    const sanitizedValue = value.replace(/^'(.*)'$/, '$1');
+    
+                    // Assign the key-value pair to the object
+                    parsedObject[key] = sanitizedValue;
+                } else {
+                    //console.error(`Invalid key-value pair: ${pair}`);
+                }
+            });
+
+            setAttributes({ displayFilters: parsedObject });    
+        }
+    }, [currentDisplayFilters]);
+
+    useEffect(() => {
+        //console.log(currentDisplayFilters);
+    }, [currentDisplayFilters]);
 
     // Set initial value for selectedOptionProvider if not already set
     useEffect(() => {

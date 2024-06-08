@@ -30,6 +30,7 @@ export default function Map({ attributes, setAttributes }){
     const [height, setHeight] = useState(mapHeight);
     const { mapOptions  }  = attributes;
     const [apiKey, setApiKey] = useState(mapOptions);
+    const { displayFilters}  = attributes;
 
     useEffect(() => {
         if (mapOptions) {
@@ -71,6 +72,10 @@ export default function Map({ attributes, setAttributes }){
             setMarkers(fetchedMarkers);
         }
     }, [jsonData]);
+
+    useEffect(() => {
+        console.log(markers);
+    }, [markers]);
 
     const createIcon = (markerId) => {
         const marker = markersIcon[markerId];
@@ -153,16 +158,29 @@ export default function Map({ attributes, setAttributes }){
                 }
                 return acc;
             }, {});
-            console.log(filterOptions);
             setFilters(filterOptions);
         }
     }, [jsonData]);
 
     const [selectedFilters, setSelectedFilters] = useState({});
 
+    // const filteredMarkers = markers.filter(marker => {
+    //     return Object.keys(selectedFilters).every(filterKey => {
+    //         return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+    //     });
+    // });
+
     const filteredMarkers = markers.filter(marker => {
         return Object.keys(selectedFilters).every(filterKey => {
-            return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+            if (typeof marker[filterKey] === 'string' && marker[filterKey].includes(',')) {
+                // Split the string into an array of values
+                const markerValues = marker[filterKey].split(',');
+                // Check if any of the selected filter values match any of the marker values
+                return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].some(filterValue => markerValues.includes(filterValue));
+            } else {
+                // For single values, perform the inclusion check as before
+                return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
+            }
         });
     });
 
@@ -185,7 +203,7 @@ export default function Map({ attributes, setAttributes }){
                         <ZoomHandler />
 
 
-                        <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+                        <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} />
 
                         {/* Render Markers */}
                         {filteredMarkers && filteredMarkers.map((marker, index) => (
