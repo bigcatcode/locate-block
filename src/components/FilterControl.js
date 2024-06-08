@@ -8,7 +8,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     const [isDataReady, setIsDataReady] = useState(false);
 
     useEffect(() => {
-        console.log(displayFilters);
+        //console.log(displayFilters);
     }, [displayFilters]);
 
 
@@ -27,7 +27,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     const parsedDisplayFilters = parseDisplayFilters(displayFilters);
 
     useEffect(() => {
-        console.log(parsedDisplayFilters);
+        //console.log(parsedDisplayFilters);
     }, [parsedDisplayFilters]);
 
 
@@ -120,6 +120,17 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
         return getSortValue(a) - getSortValue(b);
     });
 
+    // Sort filter options alphabetically
+    const sortFilterOptions = (filterOptions) => {
+        return Object.entries(filterOptions).sort((a, b) => {
+            const valueA = getOptionValue(a[1]).toLowerCase();
+            const valueB = getOptionValue(b[1]).toLowerCase();
+            if (valueA < valueB) return -1;
+            if (valueA > valueB) return 1;
+            return 0;
+        });
+    };
+
     // Only render the filter controls if data is ready
     if (!isDataReady || !displayFilters) {
         return null; // Or some loading indicator
@@ -166,11 +177,16 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                                         value={selectedFilters[filterKey] ? selectedFilters[filterKey][0] : ''}
                                         onChange={(e) => handleSelectChange(filterKey, e.target.value)}
                                     >
-                                        {Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (
+                                        {/* {Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (
                                             <option key={optionKey} value={optionKey}>
                                                 {getOptionValue(optionValue)}
                                             </option>
-                                        ))}
+                                        ))} */}
+                                        {sortFilterOptions(filters[filterKey]).map(([optionKey, optionValue]) => (
+                                            <option key={optionKey} value={optionKey}>
+                                                {getOptionValue(optionValue)}
+                                            </option>
+                                        ))}                                        
                                     </select>
                                 ) : getFilterType(filterKey) === 'range' ? (
                                     <RangeControl
@@ -181,7 +197,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                                         max={getRangeValues(filterKey).max}
                                     />                                    
                                 ) : (
-                                    Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (
+                                    sortFilterOptions(filters[filterKey]).map(([optionKey, optionValue]) => (
                                         <label key={optionKey}>
                                             <div>
                                                 <input
@@ -192,7 +208,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                                                 <span>{getOptionValue(optionValue)}</span>
                                             </div>
                                         </label>
-                                    ))
+                                    ))                                    
                                 )}
                             </div>
                         )

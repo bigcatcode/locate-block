@@ -31,6 +31,38 @@ export default function Map({ attributes, setAttributes }){
     const { mapOptions  }  = attributes;
     const [apiKey, setApiKey] = useState(mapOptions);
     const { displayFilters}  = attributes;
+    const { posts } = attributes; 
+    const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
+    const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
+    
+    useEffect(() => {
+        if (currentDisplayFilters) {
+            const pairs = currentDisplayFilters.split(',');
+            //console.log(pairs);
+            const parsedObject = {};
+
+            pairs.forEach(pair => {
+                // Split the pair by colon to extract key and value
+                const keyValue = pair.split(':');
+                
+                // Check if the pair has at least two elements
+                if (keyValue.length >= 2) {
+                    const key = keyValue[0].trim();
+                    const value = keyValue.slice(1).join(':').trim();
+    
+                    // Remove single quotes from the value
+                    const sanitizedValue = value.replace(/^'(.*)'$/, '$1');
+    
+                    // Assign the key-value pair to the object
+                    parsedObject[key] = sanitizedValue;
+                } else {
+                    //console.error(`Invalid key-value pair: ${pair}`);
+                }
+            });
+
+            setAttributes({ displayFilters: parsedObject });    
+        }
+    }, [currentDisplayFilters]);
 
     useEffect(() => {
         if (mapOptions) {
@@ -74,7 +106,7 @@ export default function Map({ attributes, setAttributes }){
     }, [jsonData]);
 
     useEffect(() => {
-        console.log(markers);
+        //console.log(markers);
     }, [markers]);
 
     const createIcon = (markerId) => {

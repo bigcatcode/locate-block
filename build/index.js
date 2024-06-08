@@ -36,7 +36,7 @@ const FilterControl = ({
   const [taxonomyLabels, setTaxonomyLabels] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
   const [isDataReady, setIsDataReady] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(displayFilters);
+    //console.log(displayFilters);
   }, [displayFilters]);
 
   // Parse displayFilters keys to remove quotes
@@ -52,7 +52,7 @@ const FilterControl = ({
   };
   const parsedDisplayFilters = parseDisplayFilters(displayFilters);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(parsedDisplayFilters);
+    //console.log(parsedDisplayFilters);
   }, [parsedDisplayFilters]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
@@ -148,6 +148,17 @@ const FilterControl = ({
     return getSortValue(a) - getSortValue(b);
   });
 
+  // Sort filter options alphabetically
+  const sortFilterOptions = filterOptions => {
+    return Object.entries(filterOptions).sort((a, b) => {
+      const valueA = getOptionValue(a[1]).toLowerCase();
+      const valueB = getOptionValue(b[1]).toLowerCase();
+      if (valueA < valueB) return -1;
+      if (valueA > valueB) return 1;
+      return 0;
+    });
+  };
+
   // Only render the filter controls if data is ready
   if (!isDataReady || !displayFilters) {
     return null; // Or some loading indicator
@@ -175,7 +186,7 @@ const FilterControl = ({
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, taxonomyLabels[filterKey]), getFilterType(filterKey) === 'select' ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
     value: selectedFilters[filterKey] ? selectedFilters[filterKey][0] : '',
     onChange: e => handleSelectChange(filterKey, e.target.value)
-  }, Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
+  }, sortFilterOptions(filters[filterKey]).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
     key: optionKey,
     value: optionKey
   }, getOptionValue(optionValue)))) : getFilterType(filterKey) === 'range' ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.RangeControl, {
@@ -184,7 +195,7 @@ const FilterControl = ({
     onChange: value => handleRangeChange(filterKey, value),
     min: getRangeValues(filterKey).min,
     max: getRangeValues(filterKey).max
-  }) : Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+  }) : sortFilterOptions(filters[filterKey]).map(([optionKey, optionValue]) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     key: optionKey
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "checkbox",
@@ -324,6 +335,39 @@ function Map({
   const {
     displayFilters
   } = attributes;
+  const {
+    posts
+  } = attributes;
+  const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
+  const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    if (currentDisplayFilters) {
+      const pairs = currentDisplayFilters.split(',');
+      //console.log(pairs);
+      const parsedObject = {};
+      pairs.forEach(pair => {
+        // Split the pair by colon to extract key and value
+        const keyValue = pair.split(':');
+
+        // Check if the pair has at least two elements
+        if (keyValue.length >= 2) {
+          const key = keyValue[0].trim();
+          const value = keyValue.slice(1).join(':').trim();
+
+          // Remove single quotes from the value
+          const sanitizedValue = value.replace(/^'(.*)'$/, '$1');
+
+          // Assign the key-value pair to the object
+          parsedObject[key] = sanitizedValue;
+        } else {
+          //console.error(`Invalid key-value pair: ${pair}`);
+        }
+      });
+      setAttributes({
+        displayFilters: parsedObject
+      });
+    }
+  }, [currentDisplayFilters]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (mapOptions) {
       setApiKey(mapOptions.googlemaps_key);
@@ -361,7 +405,7 @@ function Map({
     }
   }, [jsonData]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(markers);
+    //console.log(markers);
   }, [markers]);
   const createIcon = markerId => {
     const marker = markersIcon[markerId];
@@ -578,9 +622,6 @@ function PanelMapSettings({
   const {
     mapStartZoom
   } = attributes;
-  const {
-    displayFilters
-  } = attributes;
 
   // Get the locate-anything-map-provider for a specific post ID
   const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
@@ -589,38 +630,6 @@ function PanelMapSettings({
   const currentMapHeight = currentPostOfMap ? currentPostOfMap['locate-anything-map-height'] : 500;
   const currentMapStartZoom = currentPostOfMap ? currentPostOfMap['locate-anything-start-zoom'] : 5;
   const currentMapStartPosition = currentPostOfMap ? currentPostOfMap['locate-anything-start-position'] : null;
-  const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
-    if (currentDisplayFilters) {
-      const pairs = currentDisplayFilters.split(',');
-      //console.log(pairs);
-      const parsedObject = {};
-      pairs.forEach(pair => {
-        // Split the pair by colon to extract key and value
-        const keyValue = pair.split(':');
-
-        // Check if the pair has at least two elements
-        if (keyValue.length >= 2) {
-          const key = keyValue[0].trim();
-          const value = keyValue.slice(1).join(':').trim();
-
-          // Remove single quotes from the value
-          const sanitizedValue = value.replace(/^'(.*)'$/, '$1');
-
-          // Assign the key-value pair to the object
-          parsedObject[key] = sanitizedValue;
-        } else {
-          //console.error(`Invalid key-value pair: ${pair}`);
-        }
-      });
-      setAttributes({
-        displayFilters: parsedObject
-      });
-    }
-  }, [currentDisplayFilters]);
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
-    //console.log(currentDisplayFilters);
-  }, [currentDisplayFilters]);
 
   // Set initial value for selectedOptionProvider if not already set
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
