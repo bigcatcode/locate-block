@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { RangeControl } from '@wordpress/components';
+import { Range } from 'react-range';
 
 const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFilters }) => {
     const [taxonomyLabels, setTaxonomyLabels] = useState({});
@@ -9,7 +10,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     const [taxonomyNameByID, setTaxonomyNameByID] = useState({});
 
     useEffect(() => {
-        //console.log(displayFilters);
+        console.log(displayFilters);
     }, [displayFilters]);
 
 
@@ -107,9 +108,22 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     };
 
     const handleRangeChange = (filterKey, value) => {
+        console.log(value);
         const filterArray = taxonomyNameByID[filterKey];
-        const filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) >= parseInt(value, 10)) : [];
-        console.log(filteredArray);
+        // const filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) >= parseInt(value, 10)) : [];
+        // console.log(filteredArray);
+    
+        const filterIcon = getRangeIcon(filterKey).filterIcon;
+        let filteredArray;
+        console.log(filterIcon);
+        if (filterIcon === 'true') {
+            // Start range from max
+            filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) <= parseInt(value, 10)) : [];
+        } else {
+            // Start range from min
+            filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) >= parseInt(value, 10)) : [];
+    
+        }    
         const filterName = filteredArray.map(item => item.id.toString());
     
         setSelectedFilters(prevFilters => {
@@ -118,6 +132,26 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
             console.log(newFilters);
             return newFilters;
         });
+    };
+
+    const handleRangeChange_multirange = (filterKey, values) => {
+        const [min, max] = values;
+        console.log(values);
+        const filterArray = taxonomyNameByID[filterKey];
+        console.log(filterArray);
+        const filteredArray = filterArray
+            ? filterArray.filter(item => parseInt(item.name, 10) >= min && parseInt(item.name, 10) <= max)
+            : [];
+            console.log(filteredArray);
+        const filterIds = filteredArray.map(item => item.id.toString());
+        console.log(filterIds);
+        const filterNames = filteredArray.map(item => item.name);
+        console.log(filterNames);
+    
+        setSelectedFilters(prevFilters => ({
+            ...prevFilters,
+            [filterKey]: filterNames,
+        }));
     };
 
     const getOptionValue = (optionValue) => {
@@ -141,6 +175,13 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
         const min = parsedDisplayFilters && parsedDisplayFilters[minKey] ? parseInt(parsedDisplayFilters[minKey], 10) : 0;
         const max = parsedDisplayFilters && parsedDisplayFilters[maxKey] ? parseInt(parsedDisplayFilters[maxKey], 10) : 100;
         return { min, max };
+    };
+
+    // Get min and max range values for range filters
+    const getRangeIcon = (filterKey) => {
+        const filterIconName = `filter_icon-${filterKey}`;
+        const filterIcon = parsedDisplayFilters && parsedDisplayFilters[filterIconName] ? parsedDisplayFilters[filterIconName] : "false";
+        return { filterIcon };
     };
 
     // Get sort value for each filter from displayFilters
@@ -202,11 +243,50 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                                 ) : getFilterType(filterKey) === 'range' ? (
                                     <RangeControl
                                         label={taxonomyLabels[filterKey]}
-                                        value={selectedFilters[filterKey] ? selectedFilters[filterKey][0] : getRangeValues(filterKey).min}
+                                        value={
+                                            selectedFilters[filterKey]
+                                            ? selectedFilters[filterKey][0]
+                                            : getRangeIcon(filterKey).filterIcon === 'true'
+                                            ? getRangeValues(filterKey).max
+                                            : getRangeValues(filterKey).min
+                                        }
                                         onChange={(value) => handleRangeChange(filterKey, value)}
                                         min={getRangeValues(filterKey).min}
                                         max={getRangeValues(filterKey).max}
-                                    />                                    
+                                    />
+
+                                // <Range
+                                //     step={1}
+                                //     min={getRangeValues(filterKey).min}
+                                //     max={getRangeValues(filterKey).max}
+                                //     values={selectedFilters[filterKey] ? selectedFilters[filterKey] : [getRangeValues(filterKey).min, getRangeValues(filterKey).max]}
+                                //     onChange={(values) => handleRangeChange_multirange(filterKey, values)}
+                                //     renderTrack={({ props, children }) => (
+                                //         <div
+                                //             {...props}
+                                //             style={{
+                                //                 ...props.style,
+                                //                 height: '6px',
+                                //                 width: '100%',
+                                //                 backgroundColor: '#ccc'
+                                //             }}
+                                //         >
+                                //             {children}
+                                //         </div>
+                                //     )}
+                                //     renderThumb={({ props }) => (
+                                //         <div
+                                //             {...props}
+                                //             style={{
+                                //                 ...props.style,
+                                //                 height: '16px',
+                                //                 width: '16px',
+                                //                 backgroundColor: '#999'
+                                //             }}
+                                //         />
+                                //     )}
+                                // />
+
                                 ) : (
                                     sortFilterOptions(filters[filterKey]).map(([optionKey, optionValue]) => (
                                         <label key={optionKey}>
