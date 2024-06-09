@@ -35,6 +35,7 @@ const FilterControl = ({
 }) => {
   const [taxonomyLabels, setTaxonomyLabels] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
   const [isDataReady, setIsDataReady] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const [taxonomyNameByID, setTaxonomyNameByID] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     //console.log(displayFilters);
   }, [displayFilters]);
@@ -54,6 +55,33 @@ const FilterControl = ({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     //console.log(parsedDisplayFilters);
   }, [parsedDisplayFilters]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    const fetchTaxonomyNameByID = async () => {
+      const promises = Object.keys(filters).map(async filterKey => {
+        try {
+          const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+            path: `/wp/v2/${filterKey}`
+          });
+          const label = response ? response : filterKey;
+          return {
+            [filterKey]: label
+          };
+        } catch (error) {
+          console.error(`Error fetching taxonomy label for ${filterKey}:`, error);
+          return {
+            [filterKey]: filterKey
+          };
+        }
+      });
+      const resolvedLabels = await Promise.all(promises);
+      const mergedLabels = Object.assign({}, ...resolvedLabels);
+      setTaxonomyNameByID(mergedLabels);
+    };
+    fetchTaxonomyNameByID();
+  }, [filters]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    console.log(taxonomyNameByID);
+  }, [taxonomyNameByID]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
       const promises = Object.keys(filters).map(async filterKey => {
@@ -105,11 +133,16 @@ const FilterControl = ({
     });
   };
   const handleRangeChange = (filterKey, value) => {
+    const filterArray = taxonomyNameByID[filterKey];
+    const filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) >= parseInt(value, 10)) : [];
+    console.log(filteredArray);
+    const filterName = filteredArray.map(item => item.id.toString());
     setSelectedFilters(prevFilters => {
       const newFilters = {
         ...prevFilters
       };
-      newFilters[filterKey] = [value];
+      newFilters[filterKey] = filterName; // Set the filtered array directly
+      console.log(newFilters);
       return newFilters;
     });
   };
@@ -405,7 +438,7 @@ function Map({
     }
   }, [jsonData]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    //console.log(markers);
+    console.log(markers);
   }, [markers]);
   const createIcon = markerId => {
     const marker = markersIcon[markerId];

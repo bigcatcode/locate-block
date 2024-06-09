@@ -6,6 +6,7 @@ import { RangeControl } from '@wordpress/components';
 const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFilters }) => {
     const [taxonomyLabels, setTaxonomyLabels] = useState({});
     const [isDataReady, setIsDataReady] = useState(false);
+    const [taxonomyNameByID, setTaxonomyNameByID] = useState({});
 
     useEffect(() => {
         //console.log(displayFilters);
@@ -33,6 +34,32 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
 
 
     useEffect(() => {
+        const fetchTaxonomyNameByID = async () => {
+            const promises = Object.keys(filters).map(async (filterKey) => {
+                try {
+                    const response = await apiFetch({
+                        path: `/wp/v2/${filterKey}`,
+                    });
+                    const label = response ? response : filterKey;
+                    return { [filterKey]: label };
+                } catch (error) {
+                    console.error(`Error fetching taxonomy label for ${filterKey}:`, error);
+                    return { [filterKey]: filterKey };
+                }
+            });
+            const resolvedLabels = await Promise.all(promises);
+            const mergedLabels = Object.assign({}, ...resolvedLabels);
+            setTaxonomyNameByID(mergedLabels);
+        };
+
+        fetchTaxonomyNameByID();
+    }, [filters]);
+
+    useEffect(() => {
+        console.log(taxonomyNameByID);
+    }, [taxonomyNameByID]);
+
+    useEffect(() => {
         const fetchTaxonomyLabels = async () => {
             const promises = Object.keys(filters).map(async (filterKey) => {
                 try {
@@ -54,6 +81,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
 
         fetchTaxonomyLabels();
     }, [filters]);
+
 
     const handleFilterChange = (filterKey, option) => {
         setSelectedFilters(prevFilters => {
@@ -79,9 +107,15 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     };
 
     const handleRangeChange = (filterKey, value) => {
+        const filterArray = taxonomyNameByID[filterKey];
+        const filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) >= parseInt(value, 10)) : [];
+        console.log(filteredArray);
+        const filterName = filteredArray.map(item => item.id.toString());
+    
         setSelectedFilters(prevFilters => {
             const newFilters = { ...prevFilters };
-            newFilters[filterKey] = [value];
+            newFilters[filterKey] = filterName; // Set the filtered array directly
+            console.log(newFilters);
             return newFilters;
         });
     };
@@ -150,24 +184,6 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                 ></div>
                 <div className="leaflet-control-layers-overlays">
                     
-                    {/* {Object.entries(filters).map(([filterKey, filterOptions]) => (
-                        <div key={filterKey}>
-                            <h3>{taxonomyLabels[filterKey]}</h3>
-                            {Object.entries(filterOptions).map(([optionKey, optionValue]) => (
-                                <label key={optionKey}>
-                                    <div>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedFilters[filterKey] && selectedFilters[filterKey].includes(optionKey)}
-                                            onClick={() => handleFilterChange(filterKey, optionKey)}
-                                        />
-                                        <span>{getOptionValue(optionValue)}</span>
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-                    ))} */}
-
                     {sortedFilters.map((filterKey) => (
                         shouldDisplayFilter(filterKey) && (
                             <div key={filterKey}>
@@ -177,11 +193,6 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                                         value={selectedFilters[filterKey] ? selectedFilters[filterKey][0] : ''}
                                         onChange={(e) => handleSelectChange(filterKey, e.target.value)}
                                     >
-                                        {/* {Object.entries(filters[filterKey]).map(([optionKey, optionValue]) => (
-                                            <option key={optionKey} value={optionKey}>
-                                                {getOptionValue(optionValue)}
-                                            </option>
-                                        ))} */}
                                         {sortFilterOptions(filters[filterKey]).map(([optionKey, optionValue]) => (
                                             <option key={optionKey} value={optionKey}>
                                                 {getOptionValue(optionValue)}

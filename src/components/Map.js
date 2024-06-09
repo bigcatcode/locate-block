@@ -106,7 +106,7 @@ export default function Map({ attributes, setAttributes }){
     }, [jsonData]);
 
     useEffect(() => {
-        //console.log(markers);
+        console.log(markers);
     }, [markers]);
 
     const createIcon = (markerId) => {
