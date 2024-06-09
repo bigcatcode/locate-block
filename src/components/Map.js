@@ -34,7 +34,19 @@ export default function Map({ attributes, setAttributes }){
     const { posts } = attributes; 
     const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
     const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
-    
+    const {tooltipTemplate}  = attributes;
+    const currentTooltipTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-tooltip-template'] : null;
+
+    useEffect(() => {
+        if (currentTooltipTemplate) {
+            setAttributes({ tooltipTemplate:  currentTooltipTemplate }); 
+        }
+    }, [currentTooltipTemplate]); 
+
+    useEffect(() => {
+        console.log(tooltipTemplate);
+    }, [tooltipTemplate]);
+
     useEffect(() => {
         if (currentDisplayFilters) {
             const pairs = currentDisplayFilters.split(',');
@@ -106,7 +118,7 @@ export default function Map({ attributes, setAttributes }){
     }, [jsonData]);
 
     useEffect(() => {
-        console.log(markers);
+        //console.log(markers);
     }, [markers]);
 
     const createIcon = (markerId) => {
@@ -196,12 +208,6 @@ export default function Map({ attributes, setAttributes }){
 
     const [selectedFilters, setSelectedFilters] = useState({});
 
-    // const filteredMarkers = markers.filter(marker => {
-    //     return Object.keys(selectedFilters).every(filterKey => {
-    //         return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
-    //     });
-    // });
-
     const filteredMarkers = markers.filter(marker => {
         return Object.keys(selectedFilters).every(filterKey => {
             if (typeof marker[filterKey] === 'string' && marker[filterKey].includes(',')) {
@@ -245,11 +251,18 @@ export default function Map({ attributes, setAttributes }){
                                 icon={createIcon(marker?.custom_marker || defaults)}
                             >
                                 <Popup>
-                                    <div>
+                                    {/* <div>
                                         <h3>{marker.title}</h3>
-                                        <p>{marker.excerpt}</p>
-                                        {/* You can include other information here */}
-                                    </div>
+                                        <p>{marker.excerpt}</p>    
+                                    </div> */}
+                                    {tooltipTemplate && (
+                                        <div dangerouslySetInnerHTML={{ __html: tooltipTemplate.replace(/\|(\w+)\|/g, (match, tag) => {
+                                            // Get the marker property based on the tag name
+                                            const property = marker[tag];
+                                            // Return the marker property
+                                            return property ? property : '';
+                                        }) }} />
+                                    )}
                                 </Popup>
                             </Marker>
                         ))}    

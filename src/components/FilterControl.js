@@ -10,7 +10,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     const [taxonomyNameByID, setTaxonomyNameByID] = useState({});
 
     useEffect(() => {
-        console.log(displayFilters);
+       // console.log(displayFilters);
     }, [displayFilters]);
 
 
@@ -57,7 +57,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     }, [filters]);
 
     useEffect(() => {
-        console.log(taxonomyNameByID);
+        //console.log(taxonomyNameByID);
     }, [taxonomyNameByID]);
 
     useEffect(() => {
@@ -108,11 +108,8 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     };
 
     const handleRangeChange = (filterKey, value) => {
-        console.log(value);
-        const filterArray = taxonomyNameByID[filterKey];
-        // const filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) >= parseInt(value, 10)) : [];
-        // console.log(filteredArray);
-    
+        //console.log(value);
+        const filterArray = taxonomyNameByID[filterKey];    
         const filterIcon = getRangeIcon(filterKey).filterIcon;
         let filteredArray;
         console.log(filterIcon);
@@ -129,7 +126,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
         setSelectedFilters(prevFilters => {
             const newFilters = { ...prevFilters };
             newFilters[filterKey] = filterName; // Set the filtered array directly
-            console.log(newFilters);
+            //console.log(newFilters);
             return newFilters;
         });
     };

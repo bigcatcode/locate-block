@@ -40,7 +40,7 @@ const FilterControl = ({
   const [isDataReady, setIsDataReady] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
   const [taxonomyNameByID, setTaxonomyNameByID] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(displayFilters);
+    // console.log(displayFilters);
   }, [displayFilters]);
 
   // Parse displayFilters keys to remove quotes
@@ -83,7 +83,7 @@ const FilterControl = ({
     fetchTaxonomyNameByID();
   }, [filters]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(taxonomyNameByID);
+    //console.log(taxonomyNameByID);
   }, [taxonomyNameByID]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
@@ -136,11 +136,8 @@ const FilterControl = ({
     });
   };
   const handleRangeChange = (filterKey, value) => {
-    console.log(value);
+    //console.log(value);
     const filterArray = taxonomyNameByID[filterKey];
-    // const filteredArray = filterArray ? filterArray.filter(item => parseInt(item.name, 10) >= parseInt(value, 10)) : [];
-    // console.log(filteredArray);
-
     const filterIcon = getRangeIcon(filterKey).filterIcon;
     let filteredArray;
     console.log(filterIcon);
@@ -157,7 +154,7 @@ const FilterControl = ({
         ...prevFilters
       };
       newFilters[filterKey] = filterName; // Set the filtered array directly
-      console.log(newFilters);
+      //console.log(newFilters);
       return newFilters;
     });
   };
@@ -446,6 +443,20 @@ function Map({
   } = attributes;
   const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
   const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
+  const {
+    tooltipTemplate
+  } = attributes;
+  const currentTooltipTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-tooltip-template'] : null;
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    if (currentTooltipTemplate) {
+      setAttributes({
+        tooltipTemplate: currentTooltipTemplate
+      });
+    }
+  }, [currentTooltipTemplate]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    console.log(tooltipTemplate);
+  }, [tooltipTemplate]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (currentDisplayFilters) {
       const pairs = currentDisplayFilters.split(',');
@@ -511,7 +522,7 @@ function Map({
     }
   }, [jsonData]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(markers);
+    //console.log(markers);
   }, [markers]);
   const createIcon = markerId => {
     const marker = markersIcon[markerId];
@@ -602,13 +613,6 @@ function Map({
     }
   }, [jsonData]);
   const [selectedFilters, setSelectedFilters] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
-
-  // const filteredMarkers = markers.filter(marker => {
-  //     return Object.keys(selectedFilters).every(filterKey => {
-  //         return selectedFilters[filterKey].length === 0 || selectedFilters[filterKey].includes(marker[filterKey]);
-  //     });
-  // });
-
   const filteredMarkers = markers.filter(marker => {
     return Object.keys(selectedFilters).every(filterKey => {
       if (typeof marker[filterKey] === 'string' && marker[filterKey].includes(',')) {
@@ -641,7 +645,16 @@ function Map({
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
     icon: createIcon(marker?.custom_marker || defaults)
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_11__.Popup, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, marker.title), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, marker.excerpt)))))));
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_11__.Popup, null, tooltipTemplate && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    dangerouslySetInnerHTML: {
+      __html: tooltipTemplate.replace(/\|(\w+)\|/g, (match, tag) => {
+        // Get the marker property based on the tag name
+        const property = marker[tag];
+        // Return the marker property
+        return property ? property : '';
+      })
+    }
+  }))))));
 }
 
 /***/ }),
