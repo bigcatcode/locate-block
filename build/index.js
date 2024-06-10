@@ -40,7 +40,7 @@ const FilterControl = ({
   const [isDataReady, setIsDataReady] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
   const [taxonomyNameByID, setTaxonomyNameByID] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    // console.log(displayFilters);
+    //console.log(displayFilters);
   }, [displayFilters]);
 
   // Parse displayFilters keys to remove quotes
@@ -447,6 +447,69 @@ function Map({
     tooltipTemplate
   } = attributes;
   const currentTooltipTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-tooltip-template'] : null;
+  const {
+    tooltipPreset
+  } = attributes;
+  const currentTooltipPreset = currentPostOfMap ? currentPostOfMap['locate-anything-tooltip-preset'] : '';
+  const [taxonomyLabels, setTaxonomyLabels] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  const [taxonomyTerms, setTaxonomyTerms] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    const fetchTaxonomyLabels = async () => {
+      const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+        path: '/wp/v2/taxonomies'
+      });
+      const labels = {};
+      const termsPromises = Object.keys(response).map(async key => {
+        if (key === 'nav_menu') {
+          return {
+            [key]: {}
+          };
+        }
+        labels[key] = response[key].name;
+        try {
+          let termsEndpoint = key;
+          if (key === 'category') {
+            termsEndpoint = 'categories';
+          }
+          if (key === 'post_tag') {
+            termsEndpoint = 'tags';
+          }
+          const terms = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
+            path: `/wp/v2/${termsEndpoint}`
+          });
+          const termsObject = {};
+          terms.forEach(term => {
+            termsObject[term.id] = term.name;
+          });
+          return {
+            [key]: termsObject
+          };
+        } catch (error) {
+          if (error?.code !== 'rest_no_route') {
+            //console.error(`Error fetching terms for taxonomy ${key}:`, error);
+          }
+          return {
+            [key]: {}
+          };
+        }
+      });
+      const termsData = await Promise.all(termsPromises);
+      const mergedTerms = Object.assign({}, ...termsData);
+      setTaxonomyLabels(labels);
+      setTaxonomyTerms(mergedTerms);
+    };
+    fetchTaxonomyLabels();
+  }, []);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    if (currentTooltipPreset) {
+      setAttributes({
+        tooltipPreset: currentTooltipPreset
+      });
+    }
+  }, [currentTooltipPreset]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    //console.log(tooltipPreset);
+  }, [tooltipPreset]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (currentTooltipTemplate) {
       setAttributes({
@@ -455,7 +518,7 @@ function Map({
     }
   }, [currentTooltipTemplate]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(tooltipTemplate);
+    //console.log(tooltipTemplate);
   }, [tooltipTemplate]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (currentDisplayFilters) {
@@ -645,13 +708,17 @@ function Map({
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
     icon: createIcon(marker?.custom_marker || defaults)
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_11__.Popup, null, tooltipTemplate && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  }, tooltipPreset && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_11__.Popup, {
+    className: tooltipPreset ? `${tooltipPreset}` : ''
+  }, tooltipTemplate && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     dangerouslySetInnerHTML: {
       __html: tooltipTemplate.replace(/\|(\w+)\|/g, (match, tag) => {
-        // Get the marker property based on the tag name
-        const property = marker[tag];
-        // Return the marker property
-        return property ? property : '';
+        if (taxonomyLabels[tag] && marker[tag]) {
+          const termIds = marker[tag].split(',');
+          const termNames = termIds.map(id => taxonomyTerms[tag][id] || id);
+          return termNames.join(', ');
+        }
+        return marker[tag] || '';
       })
     }
   }))))));

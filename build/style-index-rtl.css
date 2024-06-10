@@ -7,3 +7,113 @@
  *
  * Replace them with your own styles or remove the file completely.
  */
+/* Tooltip - none-tooltips style */
+.wp-block-create-block-locate-block .none .tooltip-wrap {
+  display: flex;
+  flex-direction: row;
+}
+
+.wp-block-create-block-locate-block .none .tooltip-content {
+  padding-right: 10px;
+}
+
+.wp-block-create-block-locate-block .none a.tooltip-link {
+  text-align: center;
+  display: block;
+  border: 1px solid;
+  padding: 5px;
+  margin: 10px 0;
+  border-radius: 5px;
+  background-color: #0078A8;
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Tooltip - fullwidth-tooltips style */
+.wp-block-create-block-locate-block .nice-tooltips .leaflet-popup-content {
+  margin: 0 !important;
+}
+
+.wp-block-create-block-locate-block .nice-tooltips .leaflet-popup-content {
+  width: auto;
+  height: auto;
+  min-width: 270px;
+}
+
+.wp-block-create-block-locate-block .nice-tooltips .leaflet-popup-content div#mask {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wp-block-create-block-locate-block .nice-tooltips .leaflet-popup-content div#mask img {
+  border-radius: 10px;
+}
+
+.wp-block-create-block-locate-block .nice-tooltips .tooltip-content {
+  padding: 10px;
+}
+
+.wp-block-create-block-locate-block .leaflet-container .nice-tooltips a.tooltip-link {
+  text-align: center;
+  display: block;
+  border: 1px solid;
+  padding: 5px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: #0078A8;
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Tooltip - gutenberg-tooltip style */
+.wp-block-create-block-locate-block .gutenberg-tooltips .locateandfilter-tooltip-content h3 {
+  margin-block-start: 5px;
+  margin-block-end: 5px;
+  font-size: 26px;
+  line-height: 36px;
+  padding-left: 10px;
+}
+
+.wp-block-create-block-locate-block .gutenberg-tooltips .locateandfilter-tooltip-content h3 a {
+  text-decoration: none;
+}
+
+.wp-block-create-block-locate-block .gutenberg-tooltips .locateandfilter-tooltip-content h4 {
+  margin-block-start: 5px;
+  margin-block-end: 5px;
+}
+
+.wp-block-create-block-locate-block .gutenberg-tooltips .leaflet-popup-content .locateandfilter-tooltip-content p {
+  margin: 0;
+}
+
+.wp-block-create-block-locate-block .gutenberg-tooltips .locateandfilter-tooltip-content a:hover {
+  color: inherit;
+}
+
+.wp-block-create-block-locate-block .gutenberg-tooltips .leaflet-popup-content-wrapper {
+  border-radius: 0;
+}
+
+.wp-block-create-block-locate-block .gutenberg-tooltips .tooltip-link button {
+  font-size: 17px;
+  line-height: 28px;
+  border-radius: 0px 0px 0px 0px;
+  padding: 10px 25px 6px 25px;
+  margin-top: 10px;
+  background: #0079a8;
+  color: #fff;
+  border: 1px solid transparent;
+  cursor: pointer;
+  -webkit-appearance: button;
+  text-transform: uppercase;
+}
+
+.wp-block-create-block-locate-block .leaflet-container .gutenberg-tooltips a.leaflet-popup-close-button {
+  top: 10px !important;
+  left: 0px !important;
+  width: 40px !important;
+  height: 40px !important;
+  font: 38px/14px Tahoma, Verdana, sans-serif !important;
+}

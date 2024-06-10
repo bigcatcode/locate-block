@@ -10,7 +10,7 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
     const [taxonomyNameByID, setTaxonomyNameByID] = useState({});
 
     useEffect(() => {
-       // console.log(displayFilters);
+       //console.log(displayFilters);
     }, [displayFilters]);
 
 

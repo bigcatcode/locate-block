@@ -130,7 +130,17 @@ function register_locateandfiltermap_custom_fields() {
             'schema'          => null,
         )
     );
-    
+
+    register_rest_field(
+        'locateandfiltermap', // Your custom post type name
+        'locate-anything-tooltip-preset', // Name of the custom field
+        array(
+            'get_callback'    => 'get_locateandfiltermap_custom_field_value', // Callback function to retrieve field value
+            'update_callback' => 'update_locateandfiltermap_custom_field_value', // Callback function to update field value
+            'schema'          => null,
+        )
+    );
+
 }
 
 function get_locateandfiltermap_custom_field_value($object, $field_name, $request) {
@@ -198,3 +208,5 @@ function enable_show_in_rest_for_all_taxonomies($args, $taxonomy) {
     return $args;
 }
 add_filter('register_taxonomy_args', 'enable_show_in_rest_for_all_taxonomies', 10, 2);
+
+

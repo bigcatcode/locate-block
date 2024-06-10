@@ -36,6 +36,59 @@ export default function Map({ attributes, setAttributes }){
     const currentDisplayFilters = currentPostOfMap ? currentPostOfMap['locate-anything-display_filters'] : null;
     const {tooltipTemplate}  = attributes;
     const currentTooltipTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-tooltip-template'] : null;
+    const {tooltipPreset}  = attributes;
+    const currentTooltipPreset = currentPostOfMap ? currentPostOfMap['locate-anything-tooltip-preset'] : '';
+    const [taxonomyLabels, setTaxonomyLabels] = useState({});
+    const [taxonomyTerms, setTaxonomyTerms] = useState({});
+
+    useEffect(() => {
+        const fetchTaxonomyLabels = async () => {
+            const response = await apiFetch({ path: '/wp/v2/taxonomies' });
+            const labels = {};
+            const termsPromises = Object.keys(response).map(async (key) => {
+                if (key === 'nav_menu') {
+                    return { [key]: {} };
+                }
+                labels[key] = response[key].name;
+                try {
+                    let termsEndpoint = key;
+                    if (key === 'category') {
+                        termsEndpoint = 'categories';
+                    }
+                    if (key === 'post_tag') {
+                        termsEndpoint = 'tags';
+                    }                    
+                    const terms = await apiFetch({ path: `/wp/v2/${termsEndpoint}` });
+                    const termsObject = {};
+                    terms.forEach(term => {
+                        termsObject[term.id] = term.name;
+                    });
+                    return { [key]: termsObject };
+                } catch (error) {
+                    if (error?.code !== 'rest_no_route') {
+                        //console.error(`Error fetching terms for taxonomy ${key}:`, error);
+                    }
+                    return { [key]: {} };
+                }
+            });
+            const termsData = await Promise.all(termsPromises);
+            const mergedTerms = Object.assign({}, ...termsData);
+            setTaxonomyLabels(labels);
+            setTaxonomyTerms(mergedTerms);
+        };
+
+        fetchTaxonomyLabels();
+    }, []);
+
+    useEffect(() => {
+        if (currentTooltipPreset) {
+            setAttributes({ tooltipPreset:  currentTooltipPreset }); 
+        }
+    }, [currentTooltipPreset]);
+
+    useEffect(() => {
+        //console.log(tooltipPreset);
+    }, [tooltipPreset]);
 
     useEffect(() => {
         if (currentTooltipTemplate) {
@@ -44,7 +97,7 @@ export default function Map({ attributes, setAttributes }){
     }, [currentTooltipTemplate]); 
 
     useEffect(() => {
-        console.log(tooltipTemplate);
+        //console.log(tooltipTemplate);
     }, [tooltipTemplate]);
 
     useEffect(() => {
@@ -250,20 +303,20 @@ export default function Map({ attributes, setAttributes }){
                                 position={[parseFloat(marker.lat), parseFloat(marker.lng)]}
                                 icon={createIcon(marker?.custom_marker || defaults)}
                             >
-                                <Popup>
-                                    {/* <div>
-                                        <h3>{marker.title}</h3>
-                                        <p>{marker.excerpt}</p>    
-                                    </div> */}
-                                    {tooltipTemplate && (
-                                        <div dangerouslySetInnerHTML={{ __html: tooltipTemplate.replace(/\|(\w+)\|/g, (match, tag) => {
-                                            // Get the marker property based on the tag name
-                                            const property = marker[tag];
-                                            // Return the marker property
-                                            return property ? property : '';
-                                        }) }} />
-                                    )}
-                                </Popup>
+                                {tooltipPreset && (
+                                    <Popup className={tooltipPreset ? `${tooltipPreset}` : ''}>
+                                        {tooltipTemplate && (
+                                            <div dangerouslySetInnerHTML={{ __html: tooltipTemplate.replace(/\|(\w+)\|/g, (match, tag) => {
+                                                if (taxonomyLabels[tag] && marker[tag]) {
+                                                    const termIds = marker[tag].split(',');
+                                                    const termNames = termIds.map(id => taxonomyTerms[tag][id] || id);
+                                                    return termNames.join(', ');
+                                                }
+                                                return marker[tag] || '';
+                                            }) }} />
+                                        )}
+                                    </Popup>
+                                )}
                             </Marker>
                         ))}    
 
