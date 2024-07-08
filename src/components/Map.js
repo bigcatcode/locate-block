@@ -40,6 +40,7 @@ export default function Map({ attributes, setAttributes }){
     const currentTooltipPreset = currentPostOfMap ? currentPostOfMap['locate-anything-tooltip-preset'] : '';
     const [taxonomyLabels, setTaxonomyLabels] = useState({});
     const [taxonomyTerms, setTaxonomyTerms] = useState({});
+    const { mapLayout } = attributes;
 
     useEffect(() => {
         const fetchTaxonomyLabels = async () => {
@@ -275,6 +276,10 @@ export default function Map({ attributes, setAttributes }){
         });
     });
 
+    useEffect(() => {
+        console.log(mapLayout);
+    }, [mapLayout]);
+
     return (
         <Fragment>
             {height && mapStartPosition && mapStartZoom && (
@@ -286,15 +291,15 @@ export default function Map({ attributes, setAttributes }){
                         scrollWheelZoom={false}
                         style={{ height: `${height}${mapHeightUnit}`, width: `${width}${mapWidthUnit}` }}
                         dragging={false}
-                        
+                        tabindex="0"
                     >
 
                         {renderLayer()}
 
                         <ZoomHandler />
+                        
 
-
-                        <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} />
+                        <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} height={height} mapHeightUnit={mapHeightUnit} />
 
                         {/* Render Markers */}
                         {filteredMarkers && filteredMarkers.map((marker, index) => (

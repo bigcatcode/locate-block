@@ -34,7 +34,9 @@ const FilterControl = ({
   filters,
   selectedFilters,
   setSelectedFilters,
-  displayFilters
+  displayFilters,
+  height,
+  mapHeightUnit
 }) => {
   const [taxonomyLabels, setTaxonomyLabels] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
   const [isDataReady, setIsDataReady] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
@@ -233,11 +235,12 @@ const FilterControl = ({
   if (!isDataReady || !displayFilters) {
     return null; // Or some loading indicator
   }
+  const calculatedHeight = mapHeightUnit === 'px' ? height - 50 : height;
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "leaflet-filter-control leaflet-control-layers leaflet-control-layers-expanded leaflet-control",
     "aria-haspopup": "true",
     style: {
-      maxHeight: '300px',
+      maxHeight: `${calculatedHeight}${mapHeightUnit}`,
       overflowY: 'auto'
     }
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("section", {
@@ -453,6 +456,9 @@ function Map({
   const currentTooltipPreset = currentPostOfMap ? currentPostOfMap['locate-anything-tooltip-preset'] : '';
   const [taxonomyLabels, setTaxonomyLabels] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
   const [taxonomyTerms, setTaxonomyTerms] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  const {
+    mapLayout
+  } = attributes;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
       const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
@@ -689,6 +695,9 @@ function Map({
       }
     });
   });
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    console.log(mapLayout);
+  }, [mapLayout]);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
@@ -698,12 +707,15 @@ function Map({
       height: `${height}${mapHeightUnit}`,
       width: `${width}${mapWidthUnit}`
     },
-    dragging: false
+    dragging: false,
+    tabindex: "0"
   }, renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
     filters: filters,
     selectedFilters: selectedFilters,
     setSelectedFilters: setSelectedFilters,
-    displayFilters: displayFilters
+    displayFilters: displayFilters,
+    height: height,
+    mapHeightUnit: mapHeightUnit
   }), filteredMarkers && filteredMarkers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_10__.Marker, {
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
@@ -780,10 +792,37 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _assets_map_la_2_png__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../assets/map-la-2.png */ "./src/assets/map-la-2.png");
+/* harmony import */ var _assets_map_la_1_png__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../assets/map-la-1.png */ "./src/assets/map-la-1.png");
+/* harmony import */ var _assets_map_la_3_png__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../assets/map-la-3.png */ "./src/assets/map-la-3.png");
+/* harmony import */ var _assets_map_la_4_png__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../assets/map-la-4.png */ "./src/assets/map-la-4.png");
 
 
 
 
+
+// Import images
+
+
+
+
+const mapLayoutOptions = [{
+  value: 'inside-right',
+  label: 'Filter Inside (Right)',
+  image: _assets_map_la_2_png__WEBPACK_IMPORTED_MODULE_4__
+}, {
+  value: 'outside-right',
+  label: 'Filter Outside (Right)',
+  image: _assets_map_la_1_png__WEBPACK_IMPORTED_MODULE_5__
+}, {
+  value: 'outside-left',
+  label: 'Filter Outside (Left)',
+  image: _assets_map_la_3_png__WEBPACK_IMPORTED_MODULE_6__
+}, {
+  value: 'outside-top',
+  label: 'Filter Outside (Top)',
+  image: _assets_map_la_4_png__WEBPACK_IMPORTED_MODULE_7__
+}];
 function PanelMapSettings({
   attributes,
   setAttributes
@@ -807,6 +846,9 @@ function PanelMapSettings({
   } = attributes;
   const {
     mapStartZoom
+  } = attributes;
+  const {
+    mapLayout
   } = attributes;
 
   // Get the locate-anything-map-provider for a specific post ID
@@ -890,6 +932,15 @@ function PanelMapSettings({
       setApiKey(mapOptions.googlemaps_key);
     }
   }, [mapOptions]);
+
+  // Set initial value for mapLayout if not already set
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
+    if (!mapLayout) {
+      setAttributes({
+        mapLayout: 'inside-right'
+      }); // Default layout
+    }
+  }, []);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
     title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Map Settings', 'locate'),
     initialOpen: true
@@ -952,7 +1003,20 @@ function PanelMapSettings({
     }),
     min: 1,
     max: 18
-  })));
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+    className: "components-base-control__label"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Map Layouts', 'locate')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "map-layout-selector"
+  }, mapLayoutOptions.map(option => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    key: option.value,
+    className: `map-layout-option ${mapLayout === option.value ? 'selected' : ''}`,
+    style: {
+      backgroundImage: `url(${option.image})`
+    },
+    onClick: () => setAttributes({
+      mapLayout: option.value
+    }) // Save mapLayout to attributes
+  })))));
 }
 
 /***/ }),
@@ -17660,6 +17724,50 @@ function getThumbDistance(thumbEl, clientX, clientY, direction) {
 
 /***/ }),
 
+/***/ "./src/assets/map-la-1.png":
+/*!*********************************!*\
+  !*** ./src/assets/map-la-1.png ***!
+  \*********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+module.exports = __webpack_require__.p + "images/map-la-1.75eebbf9.png";
+
+/***/ }),
+
+/***/ "./src/assets/map-la-2.png":
+/*!*********************************!*\
+  !*** ./src/assets/map-la-2.png ***!
+  \*********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+module.exports = __webpack_require__.p + "images/map-la-2.de71ce5e.png";
+
+/***/ }),
+
+/***/ "./src/assets/map-la-3.png":
+/*!*********************************!*\
+  !*** ./src/assets/map-la-3.png ***!
+  \*********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+module.exports = __webpack_require__.p + "images/map-la-3.08a85685.png";
+
+/***/ }),
+
+/***/ "./src/assets/map-la-4.png":
+/*!*********************************!*\
+  !*** ./src/assets/map-la-4.png ***!
+  \*********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+module.exports = __webpack_require__.p + "images/map-la-4.97b3df60.png";
+
+/***/ }),
+
 /***/ "react":
 /*!************************!*\
   !*** external "React" ***!
@@ -19223,6 +19331,18 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/tru
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/global */
+/******/ 	(() => {
+/******/ 		__webpack_require__.g = (function() {
+/******/ 			if (typeof globalThis === 'object') return globalThis;
+/******/ 			try {
+/******/ 				return this || new Function('return this')();
+/******/ 			} catch (e) {
+/******/ 				if (typeof window === 'object') return window;
+/******/ 			}
+/******/ 		})();
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
@@ -19237,6 +19357,29 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/tru
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/publicPath */
+/******/ 	(() => {
+/******/ 		var scriptUrl;
+/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
+/******/ 		var document = __webpack_require__.g.document;
+/******/ 		if (!scriptUrl && document) {
+/******/ 			if (document.currentScript)
+/******/ 				scriptUrl = document.currentScript.src;
+/******/ 			if (!scriptUrl) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				if(scripts.length) {
+/******/ 					var i = scripts.length - 1;
+/******/ 					while (i > -1 && (!scriptUrl || !/^http(s?):/.test(scriptUrl))) scriptUrl = scripts[i--].src;
+/******/ 				}
+/******/ 			}
+/******/ 		}
+/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
+/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
+/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
+/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
+/******/ 		__webpack_require__.p = scriptUrl;
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/jsonp chunk loading */

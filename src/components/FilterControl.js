@@ -4,7 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { RangeControl } from '@wordpress/components';
 import { Range } from 'react-range';
 
-const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFilters }) => {
+const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFilters, height, mapHeightUnit }) => {
     const [taxonomyLabels, setTaxonomyLabels] = useState({});
     const [isDataReady, setIsDataReady] = useState(false);
     const [taxonomyNameByID, setTaxonomyNameByID] = useState({});
@@ -208,11 +208,13 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
         return null; // Or some loading indicator
     }
 
+    const calculatedHeight = mapHeightUnit === 'px' ? height - 50 : height;
+
     return (
         <div
             className="leaflet-filter-control leaflet-control-layers leaflet-control-layers-expanded leaflet-control"
             aria-haspopup="true"
-            style={{ maxHeight: '300px', overflowY: 'auto' }}
+            style={{ maxHeight: `${calculatedHeight}${mapHeightUnit}`, overflowY: 'auto' }}
         >
             <section className="leaflet-control-layers-list">
                 <div className="leaflet-control-layers-base"></div>

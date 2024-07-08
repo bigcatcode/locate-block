@@ -2,13 +2,28 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, SelectControl, RangeControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 
+// Import images
+import insideRightImage from '../assets/map-la-2.png';
+import outsideRightImage from '../assets/map-la-1.png';
+import outsideLeftImage from '../assets/map-la-3.png';
+import outsideTopImage from '../assets/map-la-4.png';
+
+const mapLayoutOptions = [
+    { value: 'inside-right', label: 'Filter Inside (Right)', image: insideRightImage },
+    { value: 'outside-right', label: 'Filter Outside (Right)', image: outsideRightImage },
+    { value: 'outside-left', label: 'Filter Outside (Left)', image: outsideLeftImage },
+    { value: 'outside-top', label: 'Filter Outside (Top)', image: outsideTopImage },
+];
+
 export default function PanelMapSettings({ attributes, setAttributes }){
     const { posts, selectedOptionProvider, selectedOptionShortcode } = attributes; 
     const { mapWidth, mapWidthUnit, mapHeight, mapHeightUnit } = attributes; 
     const { mapscrollWheelZoom }  = attributes;
     const { mapStartPosition }  = attributes;
     const { mapStartZoom }  = attributes;
+    const { mapLayout }  = attributes;
 
+    
     // Get the locate-anything-map-provider for a specific post ID
     const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
     const mapProviderForPost = currentPostOfMap ? currentPostOfMap['locate-anything-map-provider'] : null;
@@ -75,6 +90,13 @@ export default function PanelMapSettings({ attributes, setAttributes }){
         }
     }, [mapOptions]);
 
+    // Set initial value for mapLayout if not already set
+    useEffect(() => {
+        if (!mapLayout) {
+            setAttributes({ mapLayout: 'inside-right' }); // Default layout
+        }
+    }, []);
+
     return (
         <div>
             <PanelBody
@@ -116,7 +138,23 @@ export default function PanelMapSettings({ attributes, setAttributes }){
                     onChange={(newValue) => setAttributes({ mapStartZoom: newValue })}
                     min={ 1 }
                     max={ 18 }
-                />                                               
+                />
+
+                {/* New control for map layout */}
+                <label className="components-base-control__label">{__('Map Layouts', 'locate')}</label>
+                <div className="map-layout-selector">
+                
+                    {mapLayoutOptions.map(option => (
+                        <div
+                            key={option.value}
+                            className={`map-layout-option ${mapLayout === option.value ? 'selected' : ''}`}
+                            style={{ backgroundImage: `url(${option.image})` }}
+                            onClick={() => setAttributes({ mapLayout: option.value })}  // Save mapLayout to attributes
+                        >
+                            {/* <span className="map-layout-label">{option.label}</span> */}
+                        </div>
+                    ))}
+                </div>                                             
             </PanelBody>
 
         </div>

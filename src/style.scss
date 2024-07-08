@@ -107,3 +107,23 @@
     height: 40px !important;
     font: 38px / 14px Tahoma, Verdana, sans-serif !important;
 }
+
+.map-layout-selector {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 10px;
+}
+.map-layout-option  {
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 100px;
+    height: 100px;
+    background-position: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 5px;
+}
+.map-layout-option.selected {
+    border-color: #007cba; 
+}
