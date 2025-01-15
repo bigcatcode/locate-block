@@ -9,7 +9,8 @@ import {
   Popup,
   LayersControl,
   LayerGroup,
-  useMapEvents
+  useMapEvents,
+  useMap
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ReactLeafletGoogleLayer from 'react-leaflet-google-layer';
@@ -280,6 +281,42 @@ export default function Map({ attributes, setAttributes }){
         console.log(mapLayout);
     }, [mapLayout]);
 
+    const [draggingEnabled, setDraggingEnabled] = useState(true); // State for map dragging
+    // Handle dragging state dynamically
+    const DraggingHandler = () => {
+        const map = useMap();
+
+        useEffect(() => {
+            const handleKeyDown = (e) => {
+                if (e.key === "Escape") {
+                    setDraggingEnabled(false); // Disable dragging on Esc
+                }
+            };
+
+            const handleMapClick = () => {
+                setDraggingEnabled((prev) => !prev); // Toggle dragging on map click
+            };
+
+            document.addEventListener("keydown", handleKeyDown);
+            map.on("click", handleMapClick);
+
+            return () => {
+                document.removeEventListener("keydown", handleKeyDown);
+                map.off("click", handleMapClick);
+            };
+        }, [map]);
+
+        useEffect(() => {
+            if (draggingEnabled) {
+                map.dragging.enable();
+            } else {
+                map.dragging.disable();
+            }
+        }, [draggingEnabled, map]);
+
+        return null;
+    };
+
     return (
         <Fragment>
             {height && mapStartPosition && mapStartZoom && (
@@ -290,9 +327,11 @@ export default function Map({ attributes, setAttributes }){
                         zoom={mapStartZoom}
                         scrollWheelZoom={false}
                         style={{ height: `${height}${mapHeightUnit}`, width: `${width}${mapWidthUnit}` }}
-                        dragging={false}
+                        dragging={draggingEnabled} // Use state to control dragging
                         tabindex="0"
                     >
+
+                        <DraggingHandler /> {/* Add the dynamic dragging handler */}
 
                         {renderLayer()}
 

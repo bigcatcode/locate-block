@@ -698,6 +698,35 @@ function Map({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     console.log(mapLayout);
   }, [mapLayout]);
+  const [draggingEnabled, setDraggingEnabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(true); // State for map dragging
+  // Handle dragging state dynamically
+  const DraggingHandler = () => {
+    const map = (0,react_leaflet__WEBPACK_IMPORTED_MODULE_8__.useMap)();
+    (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+      const handleKeyDown = e => {
+        if (e.key === "Escape") {
+          setDraggingEnabled(false); // Disable dragging on Esc
+        }
+      };
+      const handleMapClick = () => {
+        setDraggingEnabled(prev => !prev); // Toggle dragging on map click
+      };
+      document.addEventListener("keydown", handleKeyDown);
+      map.on("click", handleMapClick);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+        map.off("click", handleMapClick);
+      };
+    }, [map]);
+    (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+      if (draggingEnabled) {
+        map.dragging.enable();
+      } else {
+        map.dragging.disable();
+      }
+    }, [draggingEnabled, map]);
+    return null;
+  };
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
@@ -707,9 +736,10 @@ function Map({
       height: `${height}${mapHeightUnit}`,
       width: `${width}${mapWidthUnit}`
     },
-    dragging: false,
+    dragging: draggingEnabled // Use state to control dragging
+    ,
     tabindex: "0"
-  }, renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(DraggingHandler, null), " ", renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
     filters: filters,
     selectedFilters: selectedFilters,
     setSelectedFilters: setSelectedFilters,
