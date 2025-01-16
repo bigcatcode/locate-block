@@ -462,6 +462,10 @@ function Map({
   const {
     mapFitBounds
   } = attributes;
+  const {
+    navTemplate
+  } = attributes;
+  const currentNavTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-nav-template'] : null;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
       const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
@@ -517,8 +521,15 @@ function Map({
     }
   }, [currentTooltipPreset]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    //console.log(tooltipPreset);
-  }, [tooltipPreset]);
+    if (currentNavTemplate) {
+      setAttributes({
+        navTemplate: currentNavTemplate
+      });
+    }
+  }, [currentNavTemplate]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    //console.log(navTemplate);
+  }, [navTemplate]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     //console.log(mapFitBounds);
   }, [mapFitBounds]);
@@ -702,7 +713,7 @@ function Map({
     });
   });
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    console.log(mapLayout);
+    //console.log(mapLayout);
   }, [mapLayout]);
   const [draggingEnabled, setDraggingEnabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(true); // State for map dragging
   // Handle dragging state dynamically
@@ -783,7 +794,27 @@ function Map({
         return marker[tag] || '';
       })
     }
-  }))))));
+  }))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "marker-grid",
+    style: {
+      width: `${width}${mapWidthUnit}`
+    }
+  }, filteredMarkers && filteredMarkers.map((marker, index) => navTemplate ?
+  // Ensure conditional rendering is valid
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "grid-row",
+    key: index,
+    dangerouslySetInnerHTML: {
+      __html: navTemplate.replace(/\|(\w+)\|/g, (match, tag) => {
+        if (taxonomyLabels[tag] && marker[tag]) {
+          const termIds = marker[tag].split(',');
+          const termNames = termIds.map(id => taxonomyTerms[tag][id] || id);
+          return termNames.join(', ');
+        }
+        return marker[tag] || '';
+      })
+    }
+  }) : null)));
 }
 
 /***/ }),

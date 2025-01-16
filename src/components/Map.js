@@ -43,6 +43,8 @@ export default function Map({ attributes, setAttributes }){
     const [taxonomyTerms, setTaxonomyTerms] = useState({});
     const { mapLayout } = attributes;
     const { mapFitBounds } = attributes;
+    const {navTemplate}  = attributes;
+    const currentNavTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-nav-template'] : null;
 
     useEffect(() => {
         const fetchTaxonomyLabels = async () => {
@@ -90,8 +92,14 @@ export default function Map({ attributes, setAttributes }){
     }, [currentTooltipPreset]);
 
     useEffect(() => {
-        //console.log(tooltipPreset);
-    }, [tooltipPreset]);
+        if (currentNavTemplate) {
+            setAttributes({ navTemplate:  currentNavTemplate }); 
+        }
+    }, [currentNavTemplate]);
+
+    useEffect(() => {
+        //console.log(navTemplate);
+    }, [navTemplate]);
 
     useEffect(() => {
         //console.log(mapFitBounds);
@@ -283,7 +291,7 @@ export default function Map({ attributes, setAttributes }){
     });
 
     useEffect(() => {
-        console.log(mapLayout);
+        //console.log(mapLayout);
     }, [mapLayout]);
 
     const [draggingEnabled, setDraggingEnabled] = useState(true); // State for map dragging
@@ -393,6 +401,39 @@ export default function Map({ attributes, setAttributes }){
                     </MapContainer>
                 
             )}
+
+                    <div className="marker-grid" 
+                        style={{
+                            width: `${width}${mapWidthUnit}`,
+                        }}
+                    >
+                        {filteredMarkers &&
+                            filteredMarkers.map((marker, index) =>
+                                navTemplate ? ( // Ensure conditional rendering is valid
+                                    <div
+                                        className="grid-row"
+                                        key={index}
+                                        dangerouslySetInnerHTML={{
+                                            __html: navTemplate.replace(
+                                                /\|(\w+)\|/g,
+                                                (match, tag) => {
+                                                    if (taxonomyLabels[tag] && marker[tag]) {
+                                                        const termIds = marker[tag].split(',');
+                                                        const termNames = termIds.map(
+                                                            (id) =>
+                                                                taxonomyTerms[tag][id] || id
+                                                        );
+                                                        return termNames.join(', ');
+                                                    }
+                                                    return marker[tag] || '';
+                                                }
+                                            ),
+                                        }}
+                                    />
+                                ) : null
+                            )}
+                    </div>
+
         </Fragment>
     )
 

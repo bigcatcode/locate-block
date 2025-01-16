@@ -139,3 +139,51 @@
 .map-layout-option.selected {
   border-color: #007cba;
 }
+
+/* nav template */
+.marker-grid {
+  display: flex;
+  flex-wrap: wrap; /* Ensure items wrap to the next row if space is insufficient */
+  gap: 15px; /* Add space between rows and columns */
+  margin-top: 20px;
+}
+
+.grid-row {
+  flex: 1 1 calc(33.333% - 15px); /* Make each item take 1/3 of the row, minus the gap */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+  padding: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  min-width: 250px; /* Set a minimum width to prevent items from shrinking too much */
+  max-width: 100%; /* Ensure items don't exceed their container */
+  box-sizing: border-box; /* Include padding and border in width calculation */
+}
+
+.grid-row img {
+  max-width: 100%; /* Ensure images are responsive */
+  height: auto;
+  display: block;
+  margin-bottom: 10px; /* Space between image and other content */
+}
+
+.grid-row h3 {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+.grid-row p {
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.navlist-stripp-content {
+  overflow-wrap: break-word;
+  pointer-events: auto;
+  position: relative;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+       user-select: text;
+  line-height: 1.2;
+  color: black;
+}
