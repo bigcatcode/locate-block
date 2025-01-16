@@ -459,6 +459,9 @@ function Map({
   const {
     mapLayout
   } = attributes;
+  const {
+    mapFitBounds
+  } = attributes;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
       const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
@@ -516,6 +519,9 @@ function Map({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     //console.log(tooltipPreset);
   }, [tooltipPreset]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    //console.log(mapFitBounds);
+  }, [mapFitBounds]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (currentTooltipTemplate) {
       setAttributes({
@@ -727,6 +733,20 @@ function Map({
     }, [draggingEnabled, map]);
     return null;
   };
+
+  // FitBoundsHandler to adjust map bounds dynamically
+  const FitBoundsHandler = () => {
+    const map = (0,react_leaflet__WEBPACK_IMPORTED_MODULE_8__.useMap)();
+    (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+      if (mapFitBounds === '1' && filteredMarkers.length > 0) {
+        const bounds = L.featureGroup(filteredMarkers.map(marker => L.marker([parseFloat(marker.lat), parseFloat(marker.lng)]))).getBounds();
+        map.fitBounds(bounds, {
+          animate: true
+        });
+      }
+    }, [mapFitBounds, filteredMarkers, map]);
+    return null;
+  };
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
@@ -739,7 +759,7 @@ function Map({
     dragging: draggingEnabled // Use state to control dragging
     ,
     tabindex: "0"
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(DraggingHandler, null), " ", renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(FitBoundsHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(DraggingHandler, null), renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
     filters: filters,
     selectedFilters: selectedFilters,
     setSelectedFilters: setSelectedFilters,
@@ -880,6 +900,9 @@ function PanelMapSettings({
   const {
     mapLayout
   } = attributes;
+  const {
+    mapFitBounds
+  } = attributes;
 
   // Get the locate-anything-map-provider for a specific post ID
   const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
@@ -888,6 +911,7 @@ function PanelMapSettings({
   const currentMapHeight = currentPostOfMap ? currentPostOfMap['locate-anything-map-height'] : 500;
   const currentMapStartZoom = currentPostOfMap ? currentPostOfMap['locate-anything-start-zoom'] : 5;
   const currentMapStartPosition = currentPostOfMap ? currentPostOfMap['locate-anything-start-position'] : null;
+  const currentFitBounds = currentPostOfMap ? currentPostOfMap['locate-anything-enable_fitBounds'] : null;
 
   // Set initial value for selectedOptionProvider if not already set
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
@@ -971,6 +995,13 @@ function PanelMapSettings({
       }); // Default layout
     }
   }, []);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
+    if (mapFitBounds === "-1" && currentFitBounds !== null) {
+      setAttributes({
+        mapFitBounds: currentFitBounds
+      });
+    }
+  }, [currentFitBounds]);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
     title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Map Settings', 'locate'),
     initialOpen: true
@@ -1033,6 +1064,16 @@ function PanelMapSettings({
     }),
     min: 1,
     max: 18
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Enable Fit Bounds', 'locate'),
+    checked: mapFitBounds === '1' // Ensure the checkbox reflects the attribute's value
+    ,
+    onChange: isChecked => {
+      const newValue = isChecked ? '1' : ''; // Use an empty string for the unchecked state
+      setAttributes({
+        mapFitBounds: newValue
+      }); // Update the attribute
+    }
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     className: "components-base-control__label"
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Map Layouts', 'locate')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -19271,7 +19312,7 @@ function useMapEvents(handlers) {
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"text","icon":"location","description":"Gutenberg block for LocateAndFilter plugin.","example":{},"supports":{"html":false},"attributes":{"selectedOptionShortcode":{"type":"string","default":""},"selectedOptionProvider":{"type":"string","default":""},"mapWidth":{"type":"number","default":""},"mapWidthUnit":{"type":"string","default":"%"},"mapHeight":{"type":"number","default":""},"mapHeightUnit":{"type":"string","default":"px"},"mapStartPosition":{"type":"string","default":""},"mapStartZoom":{"type":"number","default":""},"mapscrollWheelZoom":{"type":"string","default":""}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"text","icon":"location","description":"Gutenberg block for LocateAndFilter plugin.","example":{},"supports":{"html":false},"attributes":{"selectedOptionShortcode":{"type":"string","default":""},"selectedOptionProvider":{"type":"string","default":""},"mapWidth":{"type":"number","default":""},"mapWidthUnit":{"type":"string","default":"%"},"mapHeight":{"type":"number","default":""},"mapHeightUnit":{"type":"string","default":"px"},"mapStartPosition":{"type":"string","default":""},"mapStartZoom":{"type":"number","default":""},"mapscrollWheelZoom":{"type":"string","default":""},"mapFitBounds":{"type":"string","default":"-1"}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
 
 /***/ })
 

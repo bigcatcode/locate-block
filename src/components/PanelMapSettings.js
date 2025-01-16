@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { PanelBody, SelectControl, RangeControl } from '@wordpress/components';
+import { PanelBody, SelectControl, RangeControl, ToggleControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 
 // Import images
@@ -22,6 +22,7 @@ export default function PanelMapSettings({ attributes, setAttributes }){
     const { mapStartPosition }  = attributes;
     const { mapStartZoom }  = attributes;
     const { mapLayout }  = attributes;
+    const { mapFitBounds } = attributes;
 
     
     // Get the locate-anything-map-provider for a specific post ID
@@ -31,6 +32,7 @@ export default function PanelMapSettings({ attributes, setAttributes }){
     const currentMapHeight = currentPostOfMap ? currentPostOfMap['locate-anything-map-height'] : 500;
     const currentMapStartZoom = currentPostOfMap ? currentPostOfMap['locate-anything-start-zoom'] : 5;
     const currentMapStartPosition = currentPostOfMap ? currentPostOfMap['locate-anything-start-position'] : null;
+    const currentFitBounds = currentPostOfMap ? currentPostOfMap['locate-anything-enable_fitBounds']: null;
  
     // Set initial value for selectedOptionProvider if not already set
     useEffect(() => {
@@ -97,6 +99,12 @@ export default function PanelMapSettings({ attributes, setAttributes }){
         }
     }, []);
 
+    useEffect(() => {
+        if (mapFitBounds === "-1" && currentFitBounds !== null) {
+            setAttributes({ mapFitBounds: currentFitBounds }); 
+        }
+    }, [currentFitBounds]);
+
     return (
         <div>
             <PanelBody
@@ -138,6 +146,15 @@ export default function PanelMapSettings({ attributes, setAttributes }){
                     onChange={(newValue) => setAttributes({ mapStartZoom: newValue })}
                     min={ 1 }
                     max={ 18 }
+                />
+
+                <ToggleControl
+                    label={__('Enable Fit Bounds', 'locate')}
+                    checked={mapFitBounds === '1'} // Ensure the checkbox reflects the attribute's value
+                    onChange={(isChecked) => {
+                        const newValue = isChecked ? '1' : ''; // Use an empty string for the unchecked state
+                        setAttributes({ mapFitBounds: newValue }); // Update the attribute
+                    }}
                 />
 
                 {/* New control for map layout */}

@@ -47,6 +47,10 @@
     "mapscrollWheelZoom": {
       "type": "string",
       "default": ""
+    },
+    "mapFitBounds": {
+      "type": "string",
+      "default": "-1"
     }
   },
   "textdomain": "locate-block",

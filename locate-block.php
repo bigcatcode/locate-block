@@ -141,6 +141,16 @@ function register_locateandfiltermap_custom_fields() {
         )
     );
 
+    register_rest_field(
+        'locateandfiltermap', // Your custom post type name
+        'locate-anything-enable_fitBounds', // Name of the custom field
+        array(
+            'get_callback'    => 'get_locateandfiltermap_custom_field_value', // Callback function to retrieve field value
+            'update_callback' => 'update_locateandfiltermap_custom_field_value', // Callback function to update field value
+            'schema'          => null,
+        )
+    );
+
 }
 
 function get_locateandfiltermap_custom_field_value($object, $field_name, $request) {

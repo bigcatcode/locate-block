@@ -42,6 +42,7 @@ export default function Map({ attributes, setAttributes }){
     const [taxonomyLabels, setTaxonomyLabels] = useState({});
     const [taxonomyTerms, setTaxonomyTerms] = useState({});
     const { mapLayout } = attributes;
+    const { mapFitBounds } = attributes;
 
     useEffect(() => {
         const fetchTaxonomyLabels = async () => {
@@ -91,6 +92,10 @@ export default function Map({ attributes, setAttributes }){
     useEffect(() => {
         //console.log(tooltipPreset);
     }, [tooltipPreset]);
+
+    useEffect(() => {
+        //console.log(mapFitBounds);
+    }, [mapFitBounds]);
 
     useEffect(() => {
         if (currentTooltipTemplate) {
@@ -317,6 +322,26 @@ export default function Map({ attributes, setAttributes }){
         return null;
     };
 
+
+    // FitBoundsHandler to adjust map bounds dynamically
+    const FitBoundsHandler = () => {
+        const map = useMap();
+
+        useEffect(() => {
+            if (mapFitBounds === '1' && filteredMarkers.length > 0) {
+                const bounds = L.featureGroup(
+                    filteredMarkers.map((marker) =>
+                        L.marker([parseFloat(marker.lat), parseFloat(marker.lng)])
+                    )
+                ).getBounds();
+
+                map.fitBounds(bounds, { animate: true });
+            }
+        }, [mapFitBounds, filteredMarkers, map]);
+
+        return null;
+    };
+
     return (
         <Fragment>
             {height && mapStartPosition && mapStartZoom && (
@@ -331,7 +356,8 @@ export default function Map({ attributes, setAttributes }){
                         tabindex="0"
                     >
 
-                        <DraggingHandler /> {/* Add the dynamic dragging handler */}
+                        <FitBoundsHandler />
+                        <DraggingHandler /> 
 
                         {renderLayer()}
 
