@@ -51,6 +51,10 @@
     "mapFitBounds": {
       "type": "string",
       "default": "-1"
+    },
+    "mapLayout": {
+      "type": "string",
+      "default": "inside-right"
     }
   },
   "textdomain": "locate-block",

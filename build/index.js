@@ -1084,9 +1084,12 @@ function PanelMapSettings({
     style: {
       backgroundImage: `url(${option.image})`
     },
-    onClick: () => setAttributes({
-      mapLayout: option.value
-    }) // Save mapLayout to attributes
+    onClick: () => {
+      setAttributes({
+        mapLayout: option.value
+      }); // Update the attribute
+      console.log('Selected map layout:', option.value); // Debug log
+    }
   })))));
 }
 
@@ -19312,7 +19315,7 @@ function useMapEvents(handlers) {
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"text","icon":"location","description":"Gutenberg block for LocateAndFilter plugin.","example":{},"supports":{"html":false},"attributes":{"selectedOptionShortcode":{"type":"string","default":""},"selectedOptionProvider":{"type":"string","default":""},"mapWidth":{"type":"number","default":""},"mapWidthUnit":{"type":"string","default":"%"},"mapHeight":{"type":"number","default":""},"mapHeightUnit":{"type":"string","default":"px"},"mapStartPosition":{"type":"string","default":""},"mapStartZoom":{"type":"number","default":""},"mapscrollWheelZoom":{"type":"string","default":""},"mapFitBounds":{"type":"string","default":"-1"}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"text","icon":"location","description":"Gutenberg block for LocateAndFilter plugin.","example":{},"supports":{"html":false},"attributes":{"selectedOptionShortcode":{"type":"string","default":""},"selectedOptionProvider":{"type":"string","default":""},"mapWidth":{"type":"number","default":""},"mapWidthUnit":{"type":"string","default":"%"},"mapHeight":{"type":"number","default":""},"mapHeightUnit":{"type":"string","default":"px"},"mapStartPosition":{"type":"string","default":""},"mapStartZoom":{"type":"number","default":""},"mapscrollWheelZoom":{"type":"string","default":""},"mapFitBounds":{"type":"string","default":"-1"},"mapLayout":{"type":"string","default":"inside-right"}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
 
 /***/ })
 

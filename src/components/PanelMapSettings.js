@@ -160,18 +160,20 @@ export default function PanelMapSettings({ attributes, setAttributes }){
                 {/* New control for map layout */}
                 <label className="components-base-control__label">{__('Map Layouts', 'locate')}</label>
                 <div className="map-layout-selector">
-                
-                    {mapLayoutOptions.map(option => (
+                    {mapLayoutOptions.map((option) => (
                         <div
                             key={option.value}
                             className={`map-layout-option ${mapLayout === option.value ? 'selected' : ''}`}
                             style={{ backgroundImage: `url(${option.image})` }}
-                            onClick={() => setAttributes({ mapLayout: option.value })}  // Save mapLayout to attributes
+                            onClick={() => {
+                                setAttributes({ mapLayout: option.value }); // Update the attribute
+                                console.log('Selected map layout:', option.value); // Debug log
+                            }}
                         >
-                            {/* <span className="map-layout-label">{option.label}</span> */}
+                           {/* <span className="map-layout-label">{option.label}</span> */}
                         </div>
                     ))}
-                </div>                                             
+                </div>                                            
             </PanelBody>
 
         </div>
