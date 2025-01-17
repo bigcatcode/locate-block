@@ -709,4 +709,32 @@ svg.leaflet-image-layer.leaflet-interactive path {
   padding: 0px;
 }
 
+.outside-top .leaflet-filter-control {
+  position: relative;
+  top: 0;
+  right: 0;
+  max-width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.outside-top .leaflet-control-layers-overlays {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.outside-top .filter-list {
+  flex: 1 1 calc(20% - 15px);
+  padding: 10px;
+  min-width: 250px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.filter-list select {
+  max-width: 100%;
+  width: 100%;
+}
+
 /*# sourceMappingURL=index.css.map*/

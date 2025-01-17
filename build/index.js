@@ -255,7 +255,8 @@ const FilterControl = ({
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "leaflet-control-layers-overlays"
   }, sortedFilters.map(filterKey => shouldDisplayFilter(filterKey) && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    key: filterKey
+    key: filterKey,
+    className: `filter-list ${filterKey}`
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, taxonomyLabels[filterKey]), getFilterType(filterKey) === 'select' ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
     value: selectedFilters[filterKey] ? selectedFilters[filterKey][0] : '',
     onChange: e => handleSelectChange(filterKey, e.target.value)
@@ -829,10 +830,10 @@ function Map({
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && mapLayout && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     style: {
       display: 'flex',
-      flexDirection: 'row'
+      flexDirection: mapLayout === 'outside-top' ? 'column' : 'row'
     },
     className: mapLayout ? `${mapLayout}` : ''
-  }, mapLayout === 'outside-left' && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
+  }, (mapLayout === 'outside-left' || mapLayout === 'outside-top') && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
     filters: filters,
     selectedFilters: selectedFilters,
     setSelectedFilters: setSelectedFilters,

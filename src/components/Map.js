@@ -422,11 +422,11 @@ export default function Map({ attributes, setAttributes }){
             {height && mapStartPosition && mapStartZoom && mapLayout && (
                 
                 <div 
-                    style={{ display: 'flex', flexDirection: 'row' }}
+                    style={{ display: 'flex', flexDirection: mapLayout === 'outside-top' ? 'column' : 'row' }}
                     className={mapLayout ? `${mapLayout}` : ''}
                 >
 
-                    {mapLayout === 'outside-left' && (
+                    {(mapLayout === 'outside-left' || mapLayout === 'outside-top') && (
                             <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} height={adjustedHeight} mapHeightUnit={mapHeightUnit} />
                     )}
 

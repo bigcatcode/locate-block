@@ -226,7 +226,10 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                     
                     {sortedFilters.map((filterKey) => (
                         shouldDisplayFilter(filterKey) && (
-                            <div key={filterKey}>
+                            <div 
+                                key={filterKey}
+                                className={`filter-list ${filterKey}`}
+                            >
                                 <h3>{taxonomyLabels[filterKey]}</h3>
                                 {getFilterType(filterKey) === 'select' ? (
                                     <select
