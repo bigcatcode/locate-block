@@ -475,6 +475,9 @@ function Map({
   } = attributes;
   const currentNavTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-nav-template'] : null;
   const currentNavlistEvent = currentPostOfMap ? currentPostOfMap['locate-anything-navlist-event'] : null;
+  const {
+    customCSS
+  } = attributes;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
       const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
@@ -781,6 +784,47 @@ function Map({
       markerRef.closePopup();
     }
   };
+
+  // Dynamically inject custom CSS into the page
+  // useEffect(() => {
+  //     if (customCSS) {
+  //         const existingStyleElement = document.getElementById('custom-map-css');
+  //         let styleElement;
+
+  //         if (existingStyleElement) {
+  //             styleElement = existingStyleElement;
+  //         } else {
+  //             styleElement = document.createElement('style');
+  //             styleElement.id = 'custom-map-css';
+  //             document.head.appendChild(styleElement);
+  //         }
+
+  //         styleElement.innerHTML = customCSS;
+
+  //         return () => {
+  //             styleElement.innerHTML = ''; // Cleanup styles
+  //         };
+  //     }
+  // }, [customCSS]);
+
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    if (customCSS) {
+      const iframe = document.querySelector('.block-editor-iframe__container iframe');
+      if (iframe) {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const existingStyleElement = iframeDoc.getElementById('custom-map-css');
+        let styleElement;
+        if (existingStyleElement) {
+          styleElement = existingStyleElement;
+        } else {
+          styleElement = iframeDoc.createElement('style');
+          styleElement.id = 'custom-map-css';
+          iframeDoc.head.appendChild(styleElement);
+        }
+        styleElement.innerHTML = customCSS;
+      }
+    }
+  }, [customCSS]);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
@@ -981,6 +1025,9 @@ function PanelMapSettings({
   const {
     mapFitBounds
   } = attributes;
+  const {
+    customCSS
+  } = attributes;
 
   // Get the locate-anything-map-provider for a specific post ID
   const currentPostOfMap = posts.find(post => post.id == selectedOptionShortcode);
@@ -1168,7 +1215,14 @@ function PanelMapSettings({
       }); // Update the attribute
       console.log('Selected map layout:', option.value); // Debug log
     }
-  })))));
+  }))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.TextareaControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Custom CSS', 'locate'),
+    help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Add custom CSS to style the map or its components.', 'locate'),
+    value: customCSS || '',
+    onChange: css => setAttributes({
+      customCSS: css
+    })
+  })));
 }
 
 /***/ }),
@@ -19393,7 +19447,7 @@ function useMapEvents(handlers) {
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"text","icon":"location","description":"Gutenberg block for LocateAndFilter plugin.","example":{},"supports":{"html":false},"attributes":{"selectedOptionShortcode":{"type":"string","default":""},"selectedOptionProvider":{"type":"string","default":""},"mapWidth":{"type":"number","default":""},"mapWidthUnit":{"type":"string","default":"%"},"mapHeight":{"type":"number","default":""},"mapHeightUnit":{"type":"string","default":"px"},"mapStartPosition":{"type":"string","default":""},"mapStartZoom":{"type":"number","default":""},"mapscrollWheelZoom":{"type":"string","default":""},"mapFitBounds":{"type":"string","default":"-1"},"mapLayout":{"type":"string","default":"inside-right"}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/locate-block","version":"0.1.0","title":"Locate Block","category":"text","icon":"location","description":"Gutenberg block for LocateAndFilter plugin.","example":{},"supports":{"html":false},"attributes":{"selectedOptionShortcode":{"type":"string","default":""},"selectedOptionProvider":{"type":"string","default":""},"mapWidth":{"type":"number","default":""},"mapWidthUnit":{"type":"string","default":"%"},"mapHeight":{"type":"number","default":""},"mapHeightUnit":{"type":"string","default":"px"},"mapStartPosition":{"type":"string","default":""},"mapStartZoom":{"type":"number","default":""},"mapscrollWheelZoom":{"type":"string","default":""},"mapFitBounds":{"type":"string","default":"-1"},"mapLayout":{"type":"string","default":"inside-right"},"customCSS":{"type":"string","default":""}},"textdomain":"locate-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
 
 /***/ })
 

@@ -55,6 +55,10 @@
         "mapLayout": {
             "type": "string",
             "default": "inside-right"
+        },
+        "customCSS": {
+            "type": "string",
+            "default": ""
         }       															
 	},	
 	"textdomain": "locate-block",

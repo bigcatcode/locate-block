@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { PanelBody, SelectControl, RangeControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, SelectControl, RangeControl, ToggleControl, TextareaControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 
 // Import images
@@ -23,6 +23,7 @@ export default function PanelMapSettings({ attributes, setAttributes }){
     const { mapStartZoom }  = attributes;
     const { mapLayout }  = attributes;
     const { mapFitBounds } = attributes;
+    const { customCSS } = attributes;
 
     
     // Get the locate-anything-map-provider for a specific post ID
@@ -173,7 +174,15 @@ export default function PanelMapSettings({ attributes, setAttributes }){
                            {/* <span className="map-layout-label">{option.label}</span> */}
                         </div>
                     ))}
-                </div>                                            
+                </div> 
+
+                <TextareaControl
+                    label={__('Custom CSS', 'locate')}
+                    help={__('Add custom CSS to style the map or its components.', 'locate')}
+                    value={customCSS || ''}
+                    onChange={(css) => setAttributes({ customCSS: css })}
+                />
+
             </PanelBody>
 
         </div>

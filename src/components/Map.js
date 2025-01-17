@@ -46,6 +46,7 @@ export default function Map({ attributes, setAttributes }){
     const {navTemplate}  = attributes;
     const currentNavTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-nav-template'] : null;
     const currentNavlistEvent = currentPostOfMap ? currentPostOfMap['locate-anything-navlist-event'] : null;
+    const {customCSS}  = attributes;
 
     useEffect(() => {
         const fetchTaxonomyLabels = async () => {
@@ -367,6 +368,49 @@ export default function Map({ attributes, setAttributes }){
         }
     };
 
+    // Dynamically inject custom CSS into the page
+    // useEffect(() => {
+    //     if (customCSS) {
+    //         const existingStyleElement = document.getElementById('custom-map-css');
+    //         let styleElement;
+    
+    //         if (existingStyleElement) {
+    //             styleElement = existingStyleElement;
+    //         } else {
+    //             styleElement = document.createElement('style');
+    //             styleElement.id = 'custom-map-css';
+    //             document.head.appendChild(styleElement);
+    //         }
+    
+    //         styleElement.innerHTML = customCSS;
+    
+    //         return () => {
+    //             styleElement.innerHTML = ''; // Cleanup styles
+    //         };
+    //     }
+    // }, [customCSS]);
+
+    useEffect(() => {
+        if (customCSS) {
+            const iframe = document.querySelector('.block-editor-iframe__container iframe');
+            if (iframe) {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const existingStyleElement = iframeDoc.getElementById('custom-map-css');
+                let styleElement;
+    
+                if (existingStyleElement) {
+                    styleElement = existingStyleElement;
+                } else {
+                    styleElement = iframeDoc.createElement('style');
+                    styleElement.id = 'custom-map-css';
+                    iframeDoc.head.appendChild(styleElement);
+                }
+    
+                styleElement.innerHTML = customCSS;
+            }
+        }
+    }, [customCSS]);
+    
     return (
         <Fragment>
             {height && mapStartPosition && mapStartZoom && (
