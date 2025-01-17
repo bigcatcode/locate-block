@@ -59,7 +59,7 @@
         "customCSS": {
             "type": "string",
             "default": ""
-        }       															
+        }      															
 	},	
 	"textdomain": "locate-block",
 	"editorScript": "file:./index.js",

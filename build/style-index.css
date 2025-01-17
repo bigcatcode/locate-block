@@ -189,4 +189,13 @@
   color: black;
 }
 
+.filter-reset {
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+.map-nav-results-found {
+  margin-top: 20px;
+}
+
 /*# sourceMappingURL=style-index.css.map*/

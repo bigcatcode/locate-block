@@ -540,8 +540,8 @@ function Map({
     }
   }, [currentNavTemplate]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    //console.log(currentNavlistEvent);
-  }, [currentNavlistEvent]);
+    //console.log(mapLayout);
+  }, [mapLayout]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     //console.log(mapFitBounds);
   }, [mapFitBounds]);
@@ -825,19 +825,33 @@ function Map({
       }
     }
   }, [customCSS]);
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
+  const adjustedHeight = mapLayout === 'outside-right' ? height + 50 : mapLayout === 'outside-left' ? height + 50 : height;
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && mapLayout && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'row'
+    },
+    className: mapLayout ? `${mapLayout}` : ''
+  }, mapLayout === 'outside-left' && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    filters: filters,
+    selectedFilters: selectedFilters,
+    setSelectedFilters: setSelectedFilters,
+    displayFilters: displayFilters,
+    height: adjustedHeight,
+    mapHeightUnit: mapHeightUnit
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
     zoom: mapStartZoom,
     scrollWheelZoom: false,
     style: {
       height: `${height}${mapHeightUnit}`,
-      width: `${width}${mapWidthUnit}`
+      width: mapLayout === 'outside-right' ? `calc(${width}${mapWidthUnit} - 260px)` : `${width}${mapWidthUnit}`
     },
     dragging: draggingEnabled // Use state to control dragging
     ,
     tabindex: "0"
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(FitBoundsHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(DraggingHandler, null), renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(FitBoundsHandler, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(DraggingHandler, null), renderLayer(), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ZoomHandler, null), mapLayout === 'inside-right' && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
     filters: filters,
     selectedFilters: selectedFilters,
     setSelectedFilters: setSelectedFilters,
@@ -864,7 +878,14 @@ function Map({
         return marker[tag] || '';
       })
     }
-  }))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  }))))), mapLayout === 'outside-right' && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_FilterControl__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    filters: filters,
+    selectedFilters: selectedFilters,
+    setSelectedFilters: setSelectedFilters,
+    displayFilters: displayFilters,
+    height: adjustedHeight,
+    mapHeightUnit: mapHeightUnit
+  })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "map-nav-wrapper",
     id: `map-nav-wrapper-${selectedOptionShortcode}`,
     style: {

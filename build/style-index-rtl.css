@@ -188,3 +188,12 @@
   line-height: 1.2;
   color: black;
 }
+
+.filter-reset {
+  margin-bottom: 20px;
+  margin-right: 10px;
+}
+
+.map-nav-results-found {
+  margin-top: 20px;
+}

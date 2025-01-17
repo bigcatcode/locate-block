@@ -47,6 +47,7 @@ export default function Map({ attributes, setAttributes }){
     const currentNavTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-nav-template'] : null;
     const currentNavlistEvent = currentPostOfMap ? currentPostOfMap['locate-anything-navlist-event'] : null;
     const {customCSS}  = attributes;
+    
 
     useEffect(() => {
         const fetchTaxonomyLabels = async () => {
@@ -100,8 +101,8 @@ export default function Map({ attributes, setAttributes }){
     }, [currentNavTemplate]);
 
     useEffect(() => {
-        //console.log(currentNavlistEvent);
-    }, [currentNavlistEvent]);
+        //console.log(mapLayout);
+    }, [mapLayout]);
 
     useEffect(() => {
         //console.log(mapFitBounds);
@@ -410,17 +411,34 @@ export default function Map({ attributes, setAttributes }){
             }
         }
     }, [customCSS]);
+
+    const adjustedHeight = 
+        mapLayout === 'outside-right' ? height + 50 : 
+        mapLayout === 'outside-left' ? height + 50 : 
+        height;
     
     return (
         <Fragment>
-            {height && mapStartPosition && mapStartZoom && (
+            {height && mapStartPosition && mapStartZoom && mapLayout && (
                 
+                <div 
+                    style={{ display: 'flex', flexDirection: 'row' }}
+                    className={mapLayout ? `${mapLayout}` : ''}
+                >
+
+                    {mapLayout === 'outside-left' && (
+                            <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} height={adjustedHeight} mapHeightUnit={mapHeightUnit} />
+                    )}
+
                     <MapContainer
                         key={`${height}${width}`}
                         center={centerCoordinates}
                         zoom={mapStartZoom}
                         scrollWheelZoom={false}
-                        style={{ height: `${height}${mapHeightUnit}`, width: `${width}${mapWidthUnit}` }}
+                        style={{
+                            height: `${height}${mapHeightUnit}`,
+                            width: mapLayout === 'outside-right' ? `calc(${width}${mapWidthUnit} - 260px)` : `${width}${mapWidthUnit}`,
+                        }}
                         dragging={draggingEnabled} // Use state to control dragging
                         tabindex="0"
                     >
@@ -432,8 +450,9 @@ export default function Map({ attributes, setAttributes }){
 
                         <ZoomHandler />
                         
-
-                        <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} height={height} mapHeightUnit={mapHeightUnit} />
+                        {mapLayout === 'inside-right' && (
+                            <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} height={height} mapHeightUnit={mapHeightUnit} />
+                        )}
 
                         {/* Render Markers */}
                         {filteredMarkers && filteredMarkers.map((marker, index) => (
@@ -463,6 +482,12 @@ export default function Map({ attributes, setAttributes }){
                         ))}    
 
                     </MapContainer>
+
+                    {mapLayout === 'outside-right' && (
+                            <FilterControl filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  displayFilters={displayFilters} height={adjustedHeight} mapHeightUnit={mapHeightUnit} />
+                    )}
+
+                </div>
                 
             )}
                     <div 

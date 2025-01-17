@@ -28,3 +28,31 @@
 	max-height: 300px;
     overflow-y: auto;
 }
+.outside-right .leaflet-filter-control,
+.outside-left .leaflet-filter-control {
+	position: relative;
+	top: 0;
+	right: 0;
+	max-width: 230px;
+	max-height: 300px;
+    overflow-y: auto;
+}
+.outside-right .leaflet-filter-control {
+	margin-left: 20px;
+}
+.outside-left .leaflet-filter-control {
+    margin-right: 20px;
+}
+
+.outside-right .leaflet-control-layers-overlays,
+.outside-left .leaflet-control-layers-overlays {
+	padding: 10px;
+}
+.outside-right .leaflet-control-layers-expanded,
+.outside-left .leaflet-control-layers-expanded {
+	padding: 0px;
+}
+.outside-right,
+.outside-left {
+	// justify-content: space-between;
+}
