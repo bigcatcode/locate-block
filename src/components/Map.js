@@ -45,6 +45,7 @@ export default function Map({ attributes, setAttributes }){
     const { mapFitBounds } = attributes;
     const {navTemplate}  = attributes;
     const currentNavTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-nav-template'] : null;
+    const currentNavlistEvent = currentPostOfMap ? currentPostOfMap['locate-anything-navlist-event'] : null;
 
     useEffect(() => {
         const fetchTaxonomyLabels = async () => {
@@ -98,8 +99,8 @@ export default function Map({ attributes, setAttributes }){
     }, [currentNavTemplate]);
 
     useEffect(() => {
-        //console.log(navTemplate);
-    }, [navTemplate]);
+        //console.log(currentNavlistEvent);
+    }, [currentNavlistEvent]);
 
     useEffect(() => {
         //console.log(mapFitBounds);
@@ -350,6 +351,22 @@ export default function Map({ attributes, setAttributes }){
         return null;
     };
 
+    const markerRefs = useRef({}); // Store references to markers
+
+    const openMarkerPopup = (markerIndex) => {
+        const markerRef = markerRefs.current[markerIndex];
+        if (markerRef) {
+            markerRef.openPopup();
+        }
+    };
+
+    const closeMarkerPopup = (markerIndex) => {
+        const markerRef = markerRefs.current[markerIndex];
+        if (markerRef) {
+            markerRef.closePopup();
+        }
+    };
+
     return (
         <Fragment>
             {height && mapStartPosition && mapStartZoom && (
@@ -380,6 +397,9 @@ export default function Map({ attributes, setAttributes }){
                                 key={index}
                                 position={[parseFloat(marker.lat), parseFloat(marker.lng)]}
                                 icon={createIcon(marker?.custom_marker || defaults)}
+                                ref={(el) => {
+                                    markerRefs.current[index] = el; // Store marker reference
+                                }}
                             >
                                 {tooltipPreset && (
                                     <Popup className={tooltipPreset ? `${tooltipPreset}` : ''}>
@@ -418,6 +438,21 @@ export default function Map({ attributes, setAttributes }){
                                         <div
                                             className="grid-row"
                                             key={index}
+                                            onClick={() => {
+                                                if (currentNavlistEvent !== 'hover') {
+                                                    openMarkerPopup(index); // Open on click if not hover mode
+                                                }
+                                            }}
+                                            onMouseEnter={() => {
+                                                if (currentNavlistEvent === 'hover') {
+                                                    openMarkerPopup(index); // Open on hover if hover mode
+                                                }
+                                            }}
+                                            onMouseLeave={() => {
+                                                if (currentNavlistEvent === 'hover') {
+                                                    closeMarkerPopup(index); // Close on hover leave if hover mode
+                                                }
+                                            }}
                                             dangerouslySetInnerHTML={{
                                                 __html: navTemplate.replace(
                                                     /\|(\w+)\|/g,

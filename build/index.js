@@ -474,6 +474,7 @@ function Map({
     navTemplate
   } = attributes;
   const currentNavTemplate = currentPostOfMap ? currentPostOfMap['locate-anything-default-nav-template'] : null;
+  const currentNavlistEvent = currentPostOfMap ? currentPostOfMap['locate-anything-navlist-event'] : null;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     const fetchTaxonomyLabels = async () => {
       const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
@@ -536,8 +537,8 @@ function Map({
     }
   }, [currentNavTemplate]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    //console.log(navTemplate);
-  }, [navTemplate]);
+    //console.log(currentNavlistEvent);
+  }, [currentNavlistEvent]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     //console.log(mapFitBounds);
   }, [mapFitBounds]);
@@ -766,6 +767,20 @@ function Map({
     }, [mapFitBounds, filteredMarkers, map]);
     return null;
   };
+  const markerRefs = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useRef)({}); // Store references to markers
+
+  const openMarkerPopup = markerIndex => {
+    const markerRef = markerRefs.current[markerIndex];
+    if (markerRef) {
+      markerRef.openPopup();
+    }
+  };
+  const closeMarkerPopup = markerIndex => {
+    const markerRef = markerRefs.current[markerIndex];
+    if (markerRef) {
+      markerRef.closePopup();
+    }
+  };
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, height && mapStartPosition && mapStartZoom && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_9__.MapContainer, {
     key: `${height}${width}`,
     center: centerCoordinates,
@@ -788,7 +803,10 @@ function Map({
   }), filteredMarkers && filteredMarkers.map((marker, index) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_10__.Marker, {
     key: index,
     position: [parseFloat(marker.lat), parseFloat(marker.lng)],
-    icon: createIcon(marker?.custom_marker || defaults)
+    icon: createIcon(marker?.custom_marker || defaults),
+    ref: el => {
+      markerRefs.current[index] = el; // Store marker reference
+    }
   }, tooltipPreset && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react_leaflet__WEBPACK_IMPORTED_MODULE_11__.Popup, {
     className: tooltipPreset ? `${tooltipPreset}` : ''
   }, tooltipTemplate && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -818,6 +836,21 @@ function Map({
   (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "grid-row",
     key: index,
+    onClick: () => {
+      if (currentNavlistEvent !== 'hover') {
+        openMarkerPopup(index); // Open on click if not hover mode
+      }
+    },
+    onMouseEnter: () => {
+      if (currentNavlistEvent === 'hover') {
+        openMarkerPopup(index); // Open on hover if hover mode
+      }
+    },
+    onMouseLeave: () => {
+      if (currentNavlistEvent === 'hover') {
+        closeMarkerPopup(index); // Close on hover leave if hover mode
+      }
+    },
     dangerouslySetInnerHTML: {
       __html: navTemplate.replace(/\|(\w+)\|/g, (match, tag) => {
         if (taxonomyLabels[tag] && marker[tag]) {
