@@ -437,7 +437,7 @@ export default function Map({ attributes, setAttributes }){
                         scrollWheelZoom={false}
                         style={{
                             height: `${height}${mapHeightUnit}`,
-                            width: mapLayout === 'outside-right' ? `calc(${width}${mapWidthUnit} - 260px)` : `${width}${mapWidthUnit}`,
+                            width: mapLayout === 'outside-right' ? `calc(${width}${mapWidthUnit} - 250px)` : `${width}${mapWidthUnit}`,
                         }}
                         dragging={draggingEnabled} // Use state to control dragging
                         tabindex="0"
