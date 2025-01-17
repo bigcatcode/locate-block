@@ -307,7 +307,15 @@ const FilterControl = ({
     type: "checkbox",
     checked: selectedFilters[filterKey] && selectedFilters[filterKey].includes(optionKey),
     onClick: () => handleFilterChange(filterKey, optionKey)
-  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, getOptionValue(optionValue))))))))));
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, getOptionValue(optionValue)))))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "filter-reset"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    type: "button",
+    onClick: () => {
+      setSelectedFilters({}); // Clear all filters
+    },
+    className: "reset-button"
+  }, "Reset Filters"))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FilterControl);
 
@@ -795,10 +803,16 @@ function Map({
       })
     }
   }))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    className: "marker-grid",
+    class: "map-nav-wrapper",
+    id: `map-nav-wrapper-${selectedOptionShortcode}`,
     style: {
       width: `${width}${mapWidthUnit}`
     }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    id: `results-found-${selectedOptionShortcode}`,
+    class: "map-nav-results-found"
+  }, filteredMarkers?.length || 0, " Results Found"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "marker-grid"
   }, filteredMarkers && filteredMarkers.map((marker, index) => navTemplate ?
   // Ensure conditional rendering is valid
   (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -814,7 +828,7 @@ function Map({
         return marker[tag] || '';
       })
     }
-  }) : null)));
+  }) : null))));
 }
 
 /***/ }),

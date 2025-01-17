@@ -401,37 +401,43 @@ export default function Map({ attributes, setAttributes }){
                     </MapContainer>
                 
             )}
-
-                    <div className="marker-grid" 
+                    <div 
+                        class="map-nav-wrapper" 
+                        id={`map-nav-wrapper-${selectedOptionShortcode}`}
                         style={{
                             width: `${width}${mapWidthUnit}`,
                         }}
                     >
-                        {filteredMarkers &&
-                            filteredMarkers.map((marker, index) =>
-                                navTemplate ? ( // Ensure conditional rendering is valid
-                                    <div
-                                        className="grid-row"
-                                        key={index}
-                                        dangerouslySetInnerHTML={{
-                                            __html: navTemplate.replace(
-                                                /\|(\w+)\|/g,
-                                                (match, tag) => {
-                                                    if (taxonomyLabels[tag] && marker[tag]) {
-                                                        const termIds = marker[tag].split(',');
-                                                        const termNames = termIds.map(
-                                                            (id) =>
-                                                                taxonomyTerms[tag][id] || id
-                                                        );
-                                                        return termNames.join(', ');
+                        <div id={`results-found-${selectedOptionShortcode}`} class="map-nav-results-found">
+                            {filteredMarkers?.length || 0} Results Found
+                        </div>
+                        <div className="marker-grid">
+                            {filteredMarkers &&
+                                filteredMarkers.map((marker, index) =>
+                                    navTemplate ? ( // Ensure conditional rendering is valid
+                                        <div
+                                            className="grid-row"
+                                            key={index}
+                                            dangerouslySetInnerHTML={{
+                                                __html: navTemplate.replace(
+                                                    /\|(\w+)\|/g,
+                                                    (match, tag) => {
+                                                        if (taxonomyLabels[tag] && marker[tag]) {
+                                                            const termIds = marker[tag].split(',');
+                                                            const termNames = termIds.map(
+                                                                (id) =>
+                                                                    taxonomyTerms[tag][id] || id
+                                                            );
+                                                            return termNames.join(', ');
+                                                        }
+                                                        return marker[tag] || '';
                                                     }
-                                                    return marker[tag] || '';
-                                                }
-                                            ),
-                                        }}
-                                    />
-                                ) : null
-                            )}
+                                                ),
+                                            }}
+                                        />
+                                    ) : null
+                                )}
+                        </div>
                     </div>
 
         </Fragment>

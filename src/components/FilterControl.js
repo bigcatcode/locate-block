@@ -305,6 +305,19 @@ const FilterControl = ({ filters, selectedFilters, setSelectedFilters, displayFi
                     ))}
 
                 </div>
+                 
+                <div className="filter-reset">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSelectedFilters({}); // Clear all filters
+                        }}
+                        className="reset-button"
+                    >
+                        Reset Filters
+                    </button>
+                </div>
+
             </section>
         </div>
     );
